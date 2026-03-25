@@ -1,23 +1,43 @@
 import { InputHandler } from '../handlers/inputHandler.js';
 import { Player } from './player.js';
+import { TileMap } from './tileMap.js';
+import { MAP_ROOM } from '../constants/mapData.js';
 
 export class Game {
-  constructor(width, height) {
+  /**
+   * @param {number} width
+   * @param {number} height
+   * @param {HTMLCanvasElement} canvas
+   */
+  constructor(width, height, canvas) {
     this.width = width;
     this.height = height;
+    this.canvas = canvas;
+    this.map = new TileMap(MAP_ROOM);
     this.player = new Player(this);
-    this.input = new InputHandler();
+    this.input = new InputHandler(canvas);
+    this.fps = 30;
+    this.frameInterval = 1000 / this.fps;
+    this.lastTime = 0;
   }
-  update() {
-    this.player.update(this.input.keys);
+  update(deltaTime, fps) {
+    this.player.update(this.input.keys, deltaTime, fps);
   }
   draw(context) {
+    this.map.draw(context); // draw map first — below the player
     this.player.draw(context);
   }
-  animate(context) {
-    context.clearRect(0, 0, this.width, this.height);
-    this.update();
-    this.draw(context);
-    requestAnimationFrame(() => this.animate(context));
+  animate(context, timeStamp = 0) {
+    const deltaTime = timeStamp - this.lastTime;
+
+    if (deltaTime >= this.frameInterval) {
+      // Snap lastTime forward without accumulating drift
+      this.lastTime = timeStamp - (deltaTime % this.frameInterval);
+      context.clearRect(0, 0, this.width, this.height);
+      this.update(deltaTime, this.fps);
+      this.draw(context);
+    }
+
+    requestAnimationFrame((timeStamp) => this.animate(context, timeStamp));
   }
 }

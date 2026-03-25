@@ -11,18 +11,23 @@
   </head>
   <body>
     <header class="header">
-      <div class="pkbd">Home</div>
-      <div class="pkbd">About</div>
+      <div class="pkbd pkbd-clickable">Home</div>
+      <div class="pkbd pkbd-clickable">About</div>
     </header>
     <main class="main-canvas-container">
       <canvas
-        class="debug-canvas"
+        class="main-canvas"
         id="mainCanvas"
         width="480"
         height="432"
+        tabindex="0"
       ></canvas>
     </main>
-
+    <div class="game-instructions-container">
+      <p class="pkbd sm game-instructions">
+        Click on the game screen to interact and enable sound
+      </p>
+    </div>
     <!-- <canvas id="debug-canvas" width="437" height="1240"></canvas> -->
   </body>
 </html>

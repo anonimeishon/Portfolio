@@ -1,9 +1,12 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH, TILE_SIZE } from '../constants/game.js';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constants/game.js';
+import {
+  TRAINER_MOVE_STEP,
+  TRAINER_MOVEMENT_SPEED_MS,
+  TRAINER_SPRITE_SIZE,
+} from '../constants/player.js';
 import { AssetLoader } from '../utils/assetLoader.js';
+import { SfxPlayer } from './sounds/sfxPlayer.js';
 
-const TRAINER_SPRITE_SIZE = 64;
-const TRAINER_MOVE_STEP = 64;
-const TRAINER_MOVEMENT_SPEED_MS = 350; // Time to move one tile (in milliseconds)
 const MAX_TARGET_X = CANVAS_WIDTH - TRAINER_SPRITE_SIZE;
 
 const MAX_TARGET_Y = CANVAS_HEIGHT - TRAINER_SPRITE_SIZE;
@@ -28,8 +31,8 @@ export class Player {
     this.width = TRAINER_SPRITE_SIZE;
     this.height = TRAINER_SPRITE_SIZE;
     // Start at tile-aligned position (multiple of TRAINER_MOVE_STEP)
-    this.x = TRAINER_MOVE_STEP;
-    this.y = TRAINER_MOVE_STEP;
+    this.x = this.game.width - TRAINER_SPRITE_SIZE * 2;
+    this.y = TRAINER_SPRITE_SIZE;
     this.sprite = this._trainerSprite();
 
     // Tile-based movement properties
@@ -43,6 +46,7 @@ export class Player {
     this.direction = 'down'; // current facing direction
     this.footIndex = 0; // alternates 0/1 for walk cycle
     this.currentFrame = this.frames['down'].neutral;
+    this.sfxPlayer = new SfxPlayer(game.canvas);
   }
   _trainerSprite() {
     let trainer = loader.get('trainer');
@@ -67,7 +71,15 @@ export class Player {
     newTargetX = Math.floor(newTargetX / TRAINER_MOVE_STEP) * TRAINER_MOVE_STEP;
     newTargetY = Math.floor(newTargetY / TRAINER_MOVE_STEP) * TRAINER_MOVE_STEP;
 
-    if (newTargetX === this.x && newTargetY === this.y) return; // wall — don't move
+    if (newTargetX === this.x && newTargetY === this.y) return; // canvas boundary
+
+    // Tile-based collision — check if the target cell contains any solid tile
+    if (
+      this.game.map.isSolid(newTargetX, newTargetY, this.width, this.height)
+    ) {
+      this.sfxPlayer.play('bump');
+      return;
+    }
 
     this.moveStartX = this.x;
     this.moveStartY = this.y;
@@ -77,7 +89,7 @@ export class Player {
     this.isMoving = true;
   }
 
-  _updatePosition() {
+  _updatePosition(deltaTime, fps) {
     const elapsed = Date.now() - this.moveStartTime;
     const progress = Math.min(elapsed / this.moveDuration, 1);
 
@@ -106,9 +118,9 @@ export class Player {
     }
   }
 
-  update(input) {
+  update(input, deltaTime, fps) {
     if (this.isMoving) {
-      this._updatePosition();
+      this._updatePosition(deltaTime, fps);
       return;
     }
 

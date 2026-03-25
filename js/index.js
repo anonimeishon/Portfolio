@@ -3,5 +3,5 @@ import { startGame } from './myWay.js';
 
 window.onload = () => {
   // startGame();
-  startGameCourse();
+  startGameCourse(mainCanvas);
 };

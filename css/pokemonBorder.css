@@ -4,12 +4,7 @@
 
 .pkbd {
   contain: layout style;
-  cursor: pointer;
 
-  &:hover {
-    transform: translate(2px, -2px);
-    box-shadow: 6px 8px 0 var(--border-color);
-  }
   position: relative;
   background-color: white;
   border: 2px solid var(--border-color);
@@ -153,4 +148,11 @@
 
   background-repeat: no-repeat;
   /*#####*/
+}
+.pkbd-clickable {
+  cursor: pointer;
+  &:hover {
+    transform: translate(2px, -2px);
+    box-shadow: 6px 8px 0 var(--border-color);
+  }
 }

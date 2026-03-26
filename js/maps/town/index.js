@@ -9,7 +9,7 @@ import {
   SCALED_TILE_SIZE,
   TILE_SCALING_AMOUNT,
 } from '../../constants/tileset.js';
-import { AssetLoader } from '../../utils/assetLoader.js';
+import { sharedLoader } from '../../utils/assetLoader.js';
 import {
   MAP_MAIN_TOWN,
   MAP_MAIN_TOWN_SOLID_TILE_IDS,
@@ -17,8 +17,10 @@ import {
   MAP_MAIN_TOWN_TILES_PER_SHEET_ROW,
 } from './constants.js';
 
-const loader = new AssetLoader();
-await loader.loadImage('tileset', `${ASSETS_BASE}Pokemon_RBY_Tile_Set_01.png`);
+await sharedLoader.loadImage(
+  'tileset',
+  `${ASSETS_BASE}Pokemon_RBY_Tile_Set_01.png`,
+);
 
 /**
  * @extends {TileMap}
@@ -32,7 +34,7 @@ export class TownMap extends TileMap {
       TILE_SCALING_AMOUNT,
       MAP_MAIN_TOWN_TILES_PER_SHEET_ROW,
       MAP_MAIN_TOWN_TILE_SIZE,
-      loader,
+      sharedLoader.get('tileset'),
       new Portal([
         {
           targetMap: 'mainRoom',

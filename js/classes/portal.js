@@ -11,7 +11,11 @@ export class Portal {
     /**
      * @type {PortalEntry[]}
      */
-    this.portals = portals;
+
+    this.portals = {};
+    portals.forEach((portal) => {
+      this.portals[`${portal.x},${portal.y}`] = portal;
+    });
   }
   /**
    * @param {Player} player
@@ -19,12 +23,16 @@ export class Portal {
    * @returns {void}
    */
   detectMove(player, game) {
-    const portal = this.portals.find(
-      (p) => p.x === player.x && p.y === player.y,
-    );
+    const portal = this.portals[`${player.x},${player.y}`];
 
     if (portal) {
-      this.move(portal.targetMap, portal.targetX, portal.targetY, player, game);
+      this._move(
+        portal.targetMap,
+        portal.targetX,
+        portal.targetY,
+        player,
+        game,
+      );
     }
   }
   /**
@@ -34,7 +42,7 @@ export class Portal {
    * @param {Player} player
    * @param {Game} game
    */
-  move(targetMap, targetX, targetY, player, game) {
+  _move(targetMap, targetX, targetY, player, game) {
     game.loadMap(targetMap);
     player.x = targetX;
     player.y = targetY;

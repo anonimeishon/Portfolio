@@ -26,9 +26,12 @@ export class Game {
   update(deltaTime, fps) {
     this.player.update(this.input.keys, deltaTime, fps);
   }
+
   loadMap(mapKey) {
+    if (!maps[mapKey]) throw new Error(`Unknown map: "${mapKey}"`);
     this.map = new maps[mapKey]();
   }
+
   draw(context) {
     this.map.draw(context); // draw map first — below the player
     this.player.draw(context);

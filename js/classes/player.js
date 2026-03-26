@@ -4,7 +4,7 @@ import {
   TRAINER_MOVEMENT_SPEED_MS,
   TRAINER_SPRITE_SIZE,
 } from '../constants/player.js';
-import { AssetLoader } from '../utils/assetLoader.js';
+import { sharedLoader } from '../utils/assetLoader.js';
 import { SfxPlayer } from './sounds/sfxPlayer.js';
 import { ASSETS_BASE } from '../constants/assets.js';
 
@@ -19,8 +19,7 @@ const directions = {
   ArrowRight: { dx: TRAINER_MOVE_STEP, dy: 0, dir: 'right' },
 };
 
-const loader = new AssetLoader();
-await loader.loadImage(
+await sharedLoader.loadImage(
   'trainer',
   `${ASSETS_BASE}sprites/pokemon_gen_1_trainer_sprite.png`,
 );
@@ -50,9 +49,7 @@ export class Player {
     this.sfxPlayer = new SfxPlayer(game.canvas);
   }
   _trainerSprite() {
-    let trainer = loader.get('trainer');
-
-    return trainer;
+    return sharedLoader.get('trainer');
   }
 
   _startMovement(input) {

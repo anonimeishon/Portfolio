@@ -3,15 +3,13 @@ import { SCALED_TILE_SIZE, TILE_SCALING_AMOUNT } from '../constants/tileset.js';
 /**
  * TileMap handles rendering the tilemap and collision detection based on a 2D array of tile IDs.
  * @param {number[][]} mapData - 2D array of tile IDs, indexed as [row][col]
- * Each tile ID corresponds to a specific tile in the tileset image, and determines if it's solid or not.
- * @param {Set<number>} solidTileIds - Set of tile IDs that should be treated as solid for collision purposes.
- * Tiles that are not in the solidTileIds set will be treated as passable.
- * @param {number} scaledTileSize - The size of each tile when drawn on the canvas, in pixels (e.g. 16 for 16x16 tiles).
- * @param {number} tileScaling - The factor by which the original tile size is scaled when drawn (e.g. 2 for 16x16 tiles drawn as 32x32).
- * @param {number} tilesPerSheetRow - The number of tiles in each row of the tileset image, used to calculate source coordinates.
- * @param {number} tileSize - The original size of each tile in the tileset image, in pixels (e.g. 8 for 8x8 tiles).
- * @param {AssetLoader} loader - The asset loader instance used to load and retrieve assets like the tileset image.
- * @param {Portal} portal - An optional Portal instance that defines areas of the map that trigger transitions to other maps.
+ * @param {Set<number>} solidTileIds - Set of tile IDs that are solid for collision purposes.
+ * @param {number} scaledTileSize - Size of each tile on the canvas in pixels.
+ * @param {number} tileScaling - Scale factor applied when drawing tiles.
+ * @param {number} tilesPerSheetRow - Number of tiles per row in the tileset image.
+ * @param {number} tileSize - Original tile size in the tileset image in pixels.
+ * @param {HTMLImageElement} tilesetImage - The tileset image to draw tiles from.
+ * @param {Portal} portal - Portal instance for map transitions.
  */
 export class TileMap {
   constructor(
@@ -21,19 +19,18 @@ export class TileMap {
     tileScaling,
     tilesPerSheetRow,
     tileSize,
-    loader,
+    tilesetImage,
     portal,
   ) {
     this.mapData = mapData; // 2D array [row][col] of tile IDs
     this.rows = mapData.length;
     this.cols = mapData[0].length;
-    this.tileset = loader.get('tileset');
+    this.tileset = tilesetImage;
     this.solidTileIds = solidTileIds;
     this.scaledTileSize = scaledTileSize;
     this.tilesPerSheetRow = tilesPerSheetRow;
     this.tileSize = tileSize;
     this.tileScaling = tileScaling;
-    this.loader = loader;
     this.portal = portal;
   }
 

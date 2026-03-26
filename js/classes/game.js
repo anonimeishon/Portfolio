@@ -5,6 +5,9 @@ import { InputHandler } from '../handlers/inputHandler.js';
 import { Player } from './player.js';
 import { maps } from '../maps/index.js';
 
+const TRANSITION_STEPS = [0.2, 0.6, 1]; // alpha at each step
+const FRAMES_PER_STEP = 4; // game frames to hold each step
+
 export class Game {
   /**
    * @param {number} width
@@ -22,8 +25,73 @@ export class Game {
     this.fps = 30;
     this.frameInterval = 1000 / this.fps;
     this.lastTime = 0;
+
+    // Transition state
+    this._transition = null; // null when idle
+  }
+
+  /**
+   * Begins a fade-out → map swap → fade-in transition.
+   * @param {string} mapKey
+   * @param {number} targetX
+   * @param {number} targetY
+   */
+  startTransition(mapKey, targetX, targetY) {
+    this._transition = {
+      phase: 'fadeOut', // 'fadeOut' | 'fadeIn'
+      stepIndex: -1,
+      framesHeld: FRAMES_PER_STEP - 1, // advance on the very next frame
+      mapKey,
+      targetX,
+      targetY,
+    };
+  }
+
+  _updateTransition() {
+    const t = this._transition;
+
+    t.framesHeld++;
+    if (t.framesHeld < FRAMES_PER_STEP) return;
+    t.framesHeld = 0;
+
+    if (t.phase === 'fadeOut') {
+      t.stepIndex++;
+      if (t.stepIndex >= TRANSITION_STEPS.length) {
+        // Fully black — swap map and teleport player
+        this.loadMap(t.mapKey);
+        this.player.x = t.targetX;
+        this.player.y = t.targetY;
+        t.phase = 'fadeIn';
+        t.stepIndex = TRANSITION_STEPS.length - 1;
+      }
+    } else {
+      t.stepIndex--;
+      if (t.stepIndex < 0) {
+        this._transition = null; // done
+        return;
+      }
+    }
+  }
+
+  get _transitionAlpha() {
+    const t = this._transition;
+    if (t.stepIndex < 0) return 0;
+    const idx = Math.min(t.stepIndex, TRANSITION_STEPS.length - 1);
+    return TRANSITION_STEPS[idx];
+  }
+
+  _drawTransition(context) {
+    context.save();
+    context.globalAlpha = this._transitionAlpha;
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, this.width, this.height);
+    context.restore();
   }
   update(deltaTime, fps) {
+    if (this._transition) {
+      this._updateTransition();
+      return; // block player input during transition
+    }
     this.player.update(this.input.keys, deltaTime, fps);
   }
 
@@ -33,8 +101,9 @@ export class Game {
   }
 
   draw(context) {
-    this.map.draw(context); // draw map first — below the player
+    this.map.draw(context);
     this.player.draw(context);
+    if (this._transition) this._drawTransition(context);
   }
   animate(context, timeStamp = 0) {
     const deltaTime = timeStamp - this.lastTime;

@@ -43,8 +43,6 @@ export class Portal {
    * @param {Game} game
    */
   _move(targetMap, targetX, targetY, player, game) {
-    game.loadMap(targetMap);
-    player.x = targetX;
-    player.y = targetY;
+    game.startTransition(targetMap, targetX, targetY);
   }
 }

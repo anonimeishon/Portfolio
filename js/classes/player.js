@@ -113,16 +113,15 @@ export class Player {
   }
 
   update(input, deltaTime, fps) {
-    if (this.enableMovement) {
-      if (this.isMoving) {
-        this._updatePosition(deltaTime, fps);
-        if (this.isMoving) return; // still mid-step, wait
-        // movement just finished — fall through to check input immediately
-      }
-
-      if (input.length === 0) return;
-      this._startMovement(input);
+    if (this.isMoving) {
+      this._updatePosition(deltaTime, fps);
+      if (this.isMoving || !this.enableMovement) return; // still mid-step, wait
+      // movement just finished — check if a portal disabled movement inside _updatePosition
+      // otherwise fall through to check input immediately
     }
+
+    if (input.length === 0) return;
+    this._startMovement(input);
   }
 
   draw(context) {

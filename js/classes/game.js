@@ -47,6 +47,7 @@ export class Game {
    * @param {number} targetY
    */
   startTransition(mapKey, targetX, targetY) {
+    this.player.enableMovement = false; // block input during transition
     this._transition = {
       phase: 'fadeOut', // 'fadeOut' | 'fadeIn'
       stepIndex: -1,
@@ -78,6 +79,7 @@ export class Game {
       t.stepIndex--;
       if (t.stepIndex < 0) {
         this._transition = null; // done
+        this.player.enableMovement = true;
         return;
       }
     }

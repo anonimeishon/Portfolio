@@ -40,7 +40,7 @@ export class TownMap extends TileMap {
           targetMap: 'mainRoom',
           targetX: TRAINER_SPRITE_SIZE * 6,
           targetY: TRAINER_SPRITE_SIZE * 1,
-          x: TRAINER_SPRITE_SIZE * 6,
+          x: TRAINER_SPRITE_SIZE * 9,
 
           y: TRAINER_SPRITE_SIZE,
         },

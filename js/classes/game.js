@@ -20,7 +20,7 @@ export class Game {
     this.height = height;
     this.canvas = canvas;
     this.map = map;
-    this.player = new Player(this);
+    this.player = new Player(this, true);
     this.input = new InputHandler(canvas);
     this.fps = 30;
     this.frameInterval = 1000 / this.fps;
@@ -28,6 +28,16 @@ export class Game {
 
     // Transition state
     this._transition = null; // null when idle
+  }
+
+  // World position of the viewport's top-left corner, keeping the player centered.
+  // Math.round keeps tile draws on integer pixels, preventing sub-pixel gaps.
+  get cameraX() {
+    return Math.round(this.player.x - this.width / 2 + this.player.width / 2);
+  }
+
+  get cameraY() {
+    return Math.round(this.player.y - this.height / 2 + this.player.height / 2);
   }
 
   /**
@@ -100,8 +110,14 @@ export class Game {
     this.map = new maps[mapKey]();
   }
 
+  /**
+   *
+   * @param {CanvasRenderingContext2D} context
+   */
   draw(context) {
-    this.map.draw(context);
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, this.width, this.height);
+    this.map.draw(context, this.cameraX, this.cameraY);
     this.player.draw(context);
     if (this._transition) this._drawTransition(context);
   }

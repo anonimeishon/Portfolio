@@ -1,16 +1,11 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constants/game.js';
 import {
-  TRAINER_MOVE_STEP,
   TRAINER_MOVEMENT_SPEED_MS,
   TRAINER_SPRITE_SIZE,
 } from '../constants/player.js';
 import { sharedLoader } from '../utils/assetLoader.js';
 import { SfxPlayer } from './sounds/sfxPlayer.js';
 import { ASSETS_BASE } from '../constants/assets.js';
-
-const MAX_TARGET_X = CANVAS_WIDTH - TRAINER_SPRITE_SIZE;
-
-const MAX_TARGET_Y = CANVAS_HEIGHT - TRAINER_SPRITE_SIZE;
+import { TRAINER_MOVE_STEP } from '../constants/movement.js';
 
 const directions = {
   ArrowUp: { dx: 0, dy: -TRAINER_MOVE_STEP, dir: 'up' },
@@ -26,11 +21,11 @@ await sharedLoader.loadImage(
 
 const debugScale = 4;
 export class Player {
-  constructor(game) {
+  constructor(game, enableMovement = false) {
     this.game = game;
     this.width = TRAINER_SPRITE_SIZE;
     this.height = TRAINER_SPRITE_SIZE;
-    // Start at tile-aligned position (multiple of TRAINER_MOVE_STEP)
+    // World-space starting position (tile-aligned)
     this.x = this.game.width - TRAINER_SPRITE_SIZE * 2;
     this.y = TRAINER_SPRITE_SIZE;
     this.sprite = this._trainerSprite();
@@ -47,6 +42,7 @@ export class Player {
     this.footIndex = 0; // alternates 0/1 for walk cycle
     this.currentFrame = this.frames['down'].neutral;
     this.sfxPlayer = new SfxPlayer(game.canvas);
+    this.enableMovement = enableMovement;
   }
   _trainerSprite() {
     return sharedLoader.get('trainer');
@@ -62,16 +58,13 @@ export class Player {
     this.direction = dir;
     this.currentFrame = this.frames[dir].neutral; // face direction immediately
 
-    let newTargetX = Math.max(0, Math.min(this.x + dx, MAX_TARGET_X));
-    let newTargetY = Math.max(0, Math.min(this.y + dy, MAX_TARGET_Y));
+    // Snap to tile grid (guards against floating point drift)
+    let newTargetX =
+      Math.floor((this.x + dx) / TRAINER_MOVE_STEP) * TRAINER_MOVE_STEP;
+    let newTargetY =
+      Math.floor((this.y + dy) / TRAINER_MOVE_STEP) * TRAINER_MOVE_STEP;
 
-    // Snap to tile grid (guards against any floating point drift)
-    newTargetX = Math.floor(newTargetX / TRAINER_MOVE_STEP) * TRAINER_MOVE_STEP;
-    newTargetY = Math.floor(newTargetY / TRAINER_MOVE_STEP) * TRAINER_MOVE_STEP;
-
-    if (newTargetX === this.x && newTargetY === this.y) return; // canvas boundary
-
-    // Tile-based collision — check if the target cell contains any solid tile
+    // Tile-based collision — out-of-bounds tiles are treated as solid
     if (
       this.game.map.isSolid(newTargetX, newTargetY, this.width, this.height)
     ) {
@@ -94,7 +87,7 @@ export class Player {
     this.x = this.moveStartX + (this.targetX - this.moveStartX) * progress;
     this.y = this.moveStartY + (this.targetY - this.moveStartY) * progress;
 
-    this._updateFrame(progress);
+    this.updateFrame(progress);
 
     if (progress >= 1) {
       this.x = this.targetX;
@@ -110,7 +103,7 @@ export class Player {
     }
   }
 
-  _updateFrame(progress) {
+  updateFrame(progress) {
     const frameSet = this.frames[this.direction];
     if (progress < 0.25 || progress >= 0.75) {
       this.currentFrame = frameSet.neutral;
@@ -120,33 +113,33 @@ export class Player {
   }
 
   update(input, deltaTime, fps) {
-    if (this.isMoving) {
-      this._updatePosition(deltaTime, fps);
-      return;
-    }
+    if (this.enableMovement) {
+      if (this.isMoving) {
+        this._updatePosition(deltaTime, fps);
+        if (this.isMoving) return; // still mid-step, wait
+        // movement just finished — fall through to check input immediately
+      }
 
-    if (input.length === 0) return;
-    this._startMovement(input);
+      if (input.length === 0) return;
+      this._startMovement(input);
+    }
   }
 
   draw(context) {
-    // Save context state before scaling
-    // context.save();
-
-    // context.fillRect(this.x, this.y, this.width, this.height);
+    // Always draw at the center of the canvas — the camera moves, not the player
+    const screenX = this.game.width / 2 - this.width / 2;
+    const screenY = this.game.height / 2 - this.height / 2;
     context.drawImage(
       this.sprite,
       this.currentFrame.x * debugScale,
       this.currentFrame.y * debugScale,
       this.width,
       this.height,
-      this.x,
-      this.y,
+      screenX,
+      screenY,
       this.width,
       this.height,
     );
-    // Restore context state (removes the scale)
-    // context.restore();
   }
   // Frames keyed by direction — neutral + walk cycle per direction
   frames = {

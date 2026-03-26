@@ -55,13 +55,14 @@ export class TileMap {
   }
 
   /**
-   *
    * @param {CanvasRenderingContext2D} context
-   * @param {number} tilesPerSheetRow
-   * @param {number} tileSize
-   * @param {number} tileScaling
+   * @param {number} cameraX - World X of the top-left corner of the viewport
+   * @param {number} cameraY - World Y of the top-left corner of the viewport
    */
-  draw(context) {
+  draw(context, cameraX = 0, cameraY = 0) {
+    context.save();
+    context.translate(-cameraX, -cameraY);
+
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
         context.save();
@@ -83,21 +84,10 @@ export class TileMap {
           this.tileSize,
           this.tileSize,
         );
-
-        // // Draw tile ID label
-        // context.font = `${this.tileSize * 0.6}px monospace`;
-        // context.fillStyle = 'cyan';
-        // context.lineWidth = 1.5 / this.tileScaling;
-        // context.strokeStyle = 'black';
-        // const label = String(tileId);
-        // const labelX = c * this.tileSize + this.tileSize / 2;
-        // const labelY = r * this.tileSize + this.tileSize * 0.7;
-        // context.textAlign = 'center';
-        // context.strokeText(label, labelX, labelY);
-        // context.fillText(label, labelX, labelY);
-
         context.restore();
       }
     }
+
+    context.restore();
   }
 }

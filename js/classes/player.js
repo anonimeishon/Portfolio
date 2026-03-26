@@ -101,7 +101,10 @@ export class Player {
 
     if (progress >= 1) {
       this.x = this.targetX;
+
       this.y = this.targetY;
+
+      this.game.map?.portal.detectMove(this, this.game);
       this.isMoving = false;
       // Only alternate foot for directions that have two walk frames
       if (this.direction === 'up' || this.direction === 'down') {

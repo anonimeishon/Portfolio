@@ -1,5 +1,6 @@
 import { Game } from './classes/game.js';
 import { CANVAS_HEIGHT, CANVAS_SCALE, CANVAS_WIDTH } from './constants/game.js';
+import { MainRoomMap } from './maps/mainRoom/index.js';
 
 export const startGameCourse = (canvas) => {
   const ctx = canvas.getContext('2d');
@@ -9,7 +10,6 @@ export const startGameCourse = (canvas) => {
 
   ctx.imageSmoothingEnabled = false;
 
-  const game = new Game(canvas.width, canvas.height, canvas);
+  const game = new Game(canvas.width, canvas.height, canvas, new MainRoomMap());
   game.animate(ctx, 0);
-  console.log(game);
 };

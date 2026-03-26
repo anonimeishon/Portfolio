@@ -1,19 +1,22 @@
+/**
+ * @import {TileMap} from './tileMap.js';
+ */
 import { InputHandler } from '../handlers/inputHandler.js';
 import { Player } from './player.js';
-import { TileMap } from './tileMap.js';
-import { MAP_ROOM } from '../constants/mapData.js';
+import { maps } from '../maps/index.js';
 
 export class Game {
   /**
    * @param {number} width
    * @param {number} height
    * @param {HTMLCanvasElement} canvas
+   * @param {TileMap} map
    */
-  constructor(width, height, canvas) {
+  constructor(width, height, canvas, map) {
     this.width = width;
     this.height = height;
     this.canvas = canvas;
-    this.map = new TileMap(MAP_ROOM);
+    this.map = map;
     this.player = new Player(this);
     this.input = new InputHandler(canvas);
     this.fps = 30;
@@ -22,6 +25,9 @@ export class Game {
   }
   update(deltaTime, fps) {
     this.player.update(this.input.keys, deltaTime, fps);
+  }
+  loadMap(mapKey) {
+    this.map = new maps[mapKey]();
   }
   draw(context) {
     this.map.draw(context); // draw map first — below the player

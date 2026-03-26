@@ -23,8 +23,6 @@ export class Portal {
       (p) => p.x === player.x && p.y === player.y,
     );
 
-    console.log('🚀 ~ portal.js:26 ~ Portal ~ detectMove ~ portal:', portal);
-
     if (portal) {
       this.move(portal.targetMap, portal.targetX, portal.targetY, player, game);
     }

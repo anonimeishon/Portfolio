@@ -60,4 +60,10 @@ export class InputHandler {
       this.keys = [];
     });
   }
+
+  /** Removes a key immediately — forces the user to release and re-press to trigger again. */
+  consumeKey(key) {
+    const idx = this.keys.indexOf(key);
+    if (idx !== -1) this.keys.splice(idx, 1);
+  }
 }

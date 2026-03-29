@@ -5,7 +5,7 @@ import {
 import { sharedLoader } from '../utils/assetLoader.js';
 import { SfxPlayer } from './sounds/sfxPlayer.js';
 import { ASSETS_BASE } from '../constants/assets.js';
-import { TRAINER_MOVE_STEP } from '../constants/movement.js';
+import { TRAINER_MOVE_STEP, directionDeltas } from '../constants/movement.js';
 import { STATE_BACKUP_THRESHOLD } from '../constants/state.js';
 
 const directions = {
@@ -44,10 +44,17 @@ export class Player {
     this.currentFrame = this.frames['down'].neutral;
     this.sfxPlayer = new SfxPlayer();
     this.enableMovement = enableMovement;
-    this.stepsSinceBackup = 0;
+    this._updateFacing();
   }
+
   _trainerSprite() {
     return sharedLoader.get('trainer');
+  }
+
+  _updateFacing() {
+    const { dx, dy } = directionDeltas[this.direction];
+    this.facingX = this.x + dx;
+    this.facingY = this.y + dy;
   }
 
   _startMovement(input) {
@@ -59,6 +66,7 @@ export class Player {
     const { dx, dy, dir } = directions[key];
     this.direction = dir;
     this.currentFrame = this.frames[dir].neutral; // face direction immediately
+    this._updateFacing();
 
     // Snap to tile grid (guards against floating point drift)
     let newTargetX =
@@ -93,18 +101,19 @@ export class Player {
 
     if (progress >= 1) {
       this.x = this.targetX;
-
       this.y = this.targetY;
+      this._updateFacing();
 
       this.game.map?.portal.detectMove(this, this.game);
       this.isMoving = false;
 
-      if (this.stepsSinceBackup >= STATE_BACKUP_THRESHOLD) {
-        this.game.state.saveStateBackup(this, this.game.map.currentMapKey);
-
-        this.stepsSinceBackup = 0;
+      if (this.game.state.stepsSinceBackup >= STATE_BACKUP_THRESHOLD) {
+        this.game.state.saveStateBackup({
+          player: this,
+          mapKey: this.game.map.currentMapKey,
+        });
       } else {
-        this.stepsSinceBackup++;
+        this.game.state.stepsSinceBackup++;
       }
       // Only alternate foot for directions that have two walk frames
       if (this.direction === 'up' || this.direction === 'down') {

@@ -9,6 +9,7 @@
  * @param {HTMLImageElement} tilesetImage - The tileset image to draw tiles from.
  * @param {Portal} portal - Portal instance for map transitions.
  * @param {string} currentMapKey - Key of the current map, used for state management.
+ * @param {import('./eventTrigger.js').EventTrigger[]} [eventTriggers] - Optional event triggers for this map.
  */
 export class TileMap {
   constructor(
@@ -21,6 +22,7 @@ export class TileMap {
     tilesetImage,
     portal,
     currentMapKey,
+    eventTriggers = [],
   ) {
     this.mapData = mapData; // 2D array [row][col] of tile IDs
     this.rows = mapData.length;
@@ -33,6 +35,7 @@ export class TileMap {
     this.tileScaling = tileScaling;
     this.portal = portal;
     this.currentMapKey = currentMapKey;
+    this.eventTriggers = eventTriggers;
   }
 
   // Returns true if the world-space bounding box overlaps any solid tile.

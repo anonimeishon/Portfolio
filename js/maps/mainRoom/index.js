@@ -3,6 +3,7 @@
  */
 import { Portal } from '../../classes/portal.js';
 import { TileMap } from '../../classes/tileMap.js';
+import { EventTrigger } from '../../classes/eventTrigger.js';
 import { ASSETS_BASE } from '../../constants/assets.js';
 import { TRAINER_SPRITE_SIZE } from '../../constants/player.js';
 import {
@@ -46,6 +47,20 @@ export class MainRoomMap extends TileMap {
         },
       ]),
       'mainRoom',
+      [
+        new EventTrigger({
+          name: 'computer',
+          positions: [
+            { x: TRAINER_SPRITE_SIZE * 0, y: TRAINER_SPRITE_SIZE * 1 },
+          ],
+          action: 'dialog',
+          dialog: [
+            [
+              'My computer... My computer... My computer... My computer... My computer... My computer... My computer... My computer... ',
+            ],
+          ],
+        }),
+      ],
     );
   }
 }

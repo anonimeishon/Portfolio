@@ -13,10 +13,10 @@ export const testThree = ({ secondaryCanvas }) => {
     60,
     secondaryCanvas.clientWidth / secondaryCanvas.clientHeight,
     0.1,
-    1000,
+    10,
   );
-  camera.position.set(0, 1.2, 3);
-
+  camera.position.set(-0.8, 0.4, 1.5);
+  camera.lookAt(0, 0, 0);
   // 🖥️ Renderer
   const renderer = new THREE.WebGLRenderer({
     canvas: secondaryCanvas,
@@ -150,11 +150,15 @@ export const testThree = ({ secondaryCanvas }) => {
         plane.position.copy({
           x: child.position.x + 0.035,
           y: child.position.y - 0.4,
-          z: child.position.z + 0.35,
+          z: child.position.z + 0.3,
         }); // slight offset to prevent z-fighting
         // plane.quaternion.copy(child.quaternion);
         geo.rotateX(Math.PI * 0.5); // orient flat in the XZ plane
-        plane.scale.copy(child.scale);
+        plane.scale.copy({
+          x: child.scale.x + 0.2,
+          y: child.scale.y,
+          z: child.scale.z + 0.1,
+        });
 
         screenParent.add(plane);
         screenMesh = plane;

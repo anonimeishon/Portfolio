@@ -7,6 +7,8 @@ import { SfxPlayer } from './sounds/sfxPlayer.js';
 import { ASSETS_BASE } from '../constants/assets.js';
 import { TRAINER_MOVE_STEP, directionDeltas } from '../constants/movement.js';
 import { STATE_BACKUP_THRESHOLD } from '../constants/state.js';
+import { TILE_SIZE } from '../constants/game.js';
+import { TILE_SCALING_AMOUNT } from '../constants/tileset.js';
 
 const directions = {
   ArrowUp: { dx: 0, dy: -TRAINER_MOVE_STEP, dir: 'up' },
@@ -33,7 +35,8 @@ export class Player {
     this.width = TRAINER_SPRITE_SIZE;
     this.height = TRAINER_SPRITE_SIZE;
     // World-space starting position (tile-aligned)
-    this.x = x ? x : this.game.width - TRAINER_SPRITE_SIZE * 2;
+    this.x = x ? x : this.game.width - TILE_SIZE * TILE_SCALING_AMOUNT * 5;
+
     this.y = y ? y : TRAINER_SPRITE_SIZE;
     this.sprite = this._trainerSprite();
 

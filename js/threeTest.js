@@ -10,16 +10,23 @@ export const testThree = ({ secondaryCanvas }) => {
   // 📷 Camera
   const camera = new THREE.PerspectiveCamera(
     60,
-    window.innerWidth / window.innerHeight,
+    secondaryCanvas.clientWidth / secondaryCanvas.clientHeight,
     0.1,
     1000,
   );
   camera.position.set(0, 1.2, 3);
 
   // 🖥️ Renderer
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  const renderer = new THREE.WebGLRenderer({
+    canvas: secondaryCanvas,
+    antialias: true,
+  });
+  // false = don't override the CSS size set by the layout
+  renderer.setSize(
+    secondaryCanvas.clientWidth,
+    secondaryCanvas.clientHeight,
+    false,
+  );
 
   // 🎮 Controls
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -32,22 +39,23 @@ export const testThree = ({ secondaryCanvas }) => {
   scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
   // 🎨 Canvas texture from the game's secondary canvas
-  secondaryCanvas.width = 160;
-  secondaryCanvas.height = 144;
+  // secondaryCanvas.width = 160;
+  // secondaryCanvas.height = 144;
   /**
    * @type {HTMLCanvasElement} theMainCanvas
    */
 
   // const texture = new THREE.CanvasTexture(secondaryCanvas);
   const texture = new THREE.CanvasTexture(mainCanvas);
+
   texture.minFilter = THREE.NearestFilter;
   texture.magFilter = THREE.NearestFilter;
-  texture.flipY = true;
+  // texture.flipY = true;
 
   // Game Boy Color LCD pixel grid shader.
   // Each GBC pixel is rendered as a near-full square with a thin dark border,
   // matching the look of the actual LCD panel — no circles.
-  const crtMaterial = new THREE.ShaderMaterial({
+  const dotMatrixMaterial = new THREE.ShaderMaterial({
     uniforms: {
       map: { value: texture },
       resolution: { value: new THREE.Vector2(160, 144) }, // GBC native resolution
@@ -132,7 +140,7 @@ export const testThree = ({ secondaryCanvas }) => {
         const geo = new THREE.PlaneGeometry(1, 1);
         const plane = new THREE.Mesh(
           geo,
-          crtMaterial,
+          dotMatrixMaterial,
           // new THREE.MeshBasicMaterial({ map: texture, transparent: true }),
         );
         plane.position.copy({
@@ -167,8 +175,12 @@ export const testThree = ({ secondaryCanvas }) => {
 
   // 📱 Resize handling
   window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.aspect = secondaryCanvas.clientWidth / secondaryCanvas.clientHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(
+      secondaryCanvas.clientWidth,
+      secondaryCanvas.clientHeight,
+      false,
+    );
   });
 };

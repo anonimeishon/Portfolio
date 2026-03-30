@@ -3,3 +3,9 @@
   max-width: 100%;
   height: auto;
 }
+.secondary-canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}

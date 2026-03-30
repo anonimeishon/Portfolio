@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constants/game.js';
 
 export const testThree = ({ secondaryCanvas }) => {
   // 🎬 Scene
@@ -58,9 +59,12 @@ export const testThree = ({ secondaryCanvas }) => {
   const dotMatrixMaterial = new THREE.ShaderMaterial({
     uniforms: {
       map: { value: texture },
-      resolution: { value: new THREE.Vector2(160, 144) }, // GBC native resolution
-      gapSize: { value: 0.1 }, // fraction of a cell used for the border (0.08–0.15)
-      gapBrightness: { value: 0.15 }, // gap colour as a fraction of pixel brightness
+      // resolution: { value: new THREE.Vector2(160, 144) }, // GBC native resolution
+      resolution: {
+        value: new THREE.Vector2(CANVAS_WIDTH, CANVAS_HEIGHT),
+      }, // GBC native resolution
+      gapSize: { value: 0.1 }, // fraction of a cell used for the border (0.03–0.1)
+      gapBrightness: { value: 0.2 }, // gap colour as a fraction of pixel brightness
     },
     vertexShader: /* glsl */ `
       varying vec2 vUv;

@@ -3,42 +3,42 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constants/game.js';
 
+export const camera = new THREE.PerspectiveCamera(
+  60,
+  secondaryCanvas.clientWidth / secondaryCanvas.clientHeight,
+  0.1,
+  10,
+);
+
+// 🎬 Scene
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+
+// 📷 Camera
+camera.position.set(-0.8, 0.4, 1.5);
+camera.lookAt(0, 0, 0);
+// 🖥️ Renderer
+const renderer = new THREE.WebGLRenderer({
+  canvas: secondaryCanvas,
+  antialias: true,
+});
+// false = don't override the CSS size set by the layout
+renderer.setSize(
+  secondaryCanvas.clientWidth,
+  secondaryCanvas.clientHeight,
+  false,
+);
+
+// 🎮 Controls
+export let controls = new OrbitControls(camera, renderer.domElement);
+
+// 💡 Lights
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 5, 5);
+scene.add(light);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 export const testThree = ({ secondaryCanvas }) => {
-  // 🎬 Scene
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x222222);
-
-  // 📷 Camera
-  const camera = new THREE.PerspectiveCamera(
-    60,
-    secondaryCanvas.clientWidth / secondaryCanvas.clientHeight,
-    0.1,
-    10,
-  );
-  camera.position.set(-0.8, 0.4, 1.5);
-  camera.lookAt(0, 0, 0);
-  // 🖥️ Renderer
-  const renderer = new THREE.WebGLRenderer({
-    canvas: secondaryCanvas,
-    antialias: true,
-  });
-  // false = don't override the CSS size set by the layout
-  renderer.setSize(
-    secondaryCanvas.clientWidth,
-    secondaryCanvas.clientHeight,
-    false,
-  );
-
-  // 🎮 Controls
-  const controls = new OrbitControls(camera, renderer.domElement);
-
-  // 💡 Lights
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(5, 5, 5);
-  scene.add(light);
-
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
   // 🎨 Canvas texture from the game's secondary canvas
   // secondaryCanvas.width = 160;
   // secondaryCanvas.height = 144;

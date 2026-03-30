@@ -21,8 +21,12 @@
   </head>
   <body>
     <header class="header">
-      <div class="pkbd pkbd-clickable">Home</div>
-      <div class="pkbd pkbd-clickable">About</div>
+      <div class="pkbd pkbd-clickable" onclick="resetCamera()">
+        Reset Camera
+      </div>
+      <div class="pkbd pkbd-clickable" onclick="setGameCamera()">
+        Game Camera
+      </div>
     </header>
     <main class="main-canvas-container">
       <canvas

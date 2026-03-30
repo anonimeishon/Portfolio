@@ -209,7 +209,7 @@ export class Dialog {
       context.fillText(
         visible,
         BOX_X + DIALOG_PADDING,
-        BOX_Y + DIALOG_PADDING + i * DIALOG_LINE_HEIGHT,
+        BOX_Y + DIALOG_PADDING + i * DIALOG_LINE_HEIGHT + 8, // +8 to better center vertically within the border
       );
     }
 

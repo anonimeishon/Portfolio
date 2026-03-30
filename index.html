@@ -1,6 +1,14 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.183.2/+esm",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+        }
+      }
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>pkbd</title>
@@ -8,6 +16,7 @@
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/canvas.css" />
     <link rel="stylesheet" href="css/arrowKeys.css" />
+
     <script src="js/index.js" type="module"></script>
   </head>
   <body>
@@ -25,6 +34,13 @@
       ></canvas>
       <!-- <canvas id="debug-canvas" width="437" height="1240"></canvas> -->
     </main>
+    <canvas
+      class="secondary-canvas"
+      id="secondaryCanvas"
+      width="480"
+      height="800"
+      tabindex="0"
+    ></canvas>
     <div class="game-instructions-container">
       <p class="pkbd sm game-instructions">
         Click on the game screen to interact and enable sound

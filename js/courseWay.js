@@ -6,7 +6,9 @@ export const startGameCourse = (canvas) => {
   const ctx = canvas.getContext('2d');
   canvas.width = CANVAS_WIDTH;
   canvas.height = CANVAS_HEIGHT;
+
   ctx.scale(CANVAS_SCALE, CANVAS_SCALE);
+  // ctx.rotate(-90 * Math.PI / 180);
 
   ctx.imageSmoothingEnabled = false;
 

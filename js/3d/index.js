@@ -45,11 +45,26 @@ export const renderScreen = ({ renderCanvas }) => {
     model.position.set(0, 0, 0);
 
     model.traverse((child) => {
-      console.log('🚀 ~ index.js:48 ~ renderScreen ~ child:', child);
+      console.log('🚀 ~ index.js:48 ~ renderScreen ~ child.name:', child.name);
+      const children = child.children.map((child) => child.name);
+      if (children?.length) {
+        console.log(
+          '🚀 ~ index.js:52 ~ renderScreen ~ child.children.name:',
+          children,
+        );
+      }
 
+      if (child?.parent?.name) {
+        console.log(
+          '🚀 ~ index.js:59 ~ renderScreen ~ parent.name:',
+          child?.parent?.name,
+        );
+      }
+
+      console.log('================================');
       if (child.isMesh && child.parent?.name === 'Screen') {
         // Hide the original atlas-mapped mesh
-        child.visible = false;
+        // child.visible = false;
 
         // Build a replacement plane as a child of the same "Screen" Object3D
         // so it inherits the exact world transform. PlaneGeometry has clean 0→1 UVs.
@@ -58,17 +73,40 @@ export const renderScreen = ({ renderCanvas }) => {
         // Match the original mesh's local transform so it sits flush on the screen.
         const geo = new THREE.PlaneGeometry(1, 1);
         const plane = new THREE.Mesh(geo, dotMatrixMaterial);
+
+        /**
+         * With this position config
+         * and setting child.visible = false, the screen will not get rendered
+         * which means there will be more space for the canvas texture
+         */
+
+        // child.visible = false;
+
+        //  plane.position.copy({
+        //   x: child.position.x + 0.035,
+        //   y: child.position.y - 0.4,
+        //   z: child.position.z + 0.3,
+        // }); // slight offset to prevent z-fighting
+        // // plane.quaternion.copy(child.quaternion);
+        // geo.rotateX(Math.PI * 0.5); // orient flat in the XZ plane
+        // plane.scale.copy({
+        //   x: child.scale.x + 0.2,
+        //   y: child.scale.y,
+        //   z: child.scale.z + 0.1,
+        // });
+
         plane.position.copy({
-          x: child.position.x + 0.035,
-          y: child.position.y - 0.4,
-          z: child.position.z + 0.3,
+          x: child.position.x + 0.04,
+          // y: child.position.y - 0.39,
+          y: child.position.y - 0.41,
+          z: child.position.z + 0.35,
         }); // slight offset to prevent z-fighting
         // plane.quaternion.copy(child.quaternion);
         geo.rotateX(Math.PI * 0.5); // orient flat in the XZ plane
         plane.scale.copy({
-          x: child.scale.x + 0.2,
-          y: child.scale.y,
-          z: child.scale.z + 0.1,
+          x: child.scale.x - 0.18,
+          y: child.scale.y + 0.1,
+          z: child.scale.z - 0.26,
         });
 
         screenParent.add(plane);

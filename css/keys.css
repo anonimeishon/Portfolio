@@ -1,5 +1,17 @@
+.controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem;
+  display: none;
+}
+@media (max-width: 600px) {
+  .controls {
+    display: flex;
+  }
+}
 .arrowKeys {
-  border: 1px solid black;
   width: 40%;
   position: relative;
   aspect-ratio: 1;
@@ -14,6 +26,7 @@
   --arrow-key-size: 30%;
   --arrow-key-radius: 30%;
   --arrow-key-hover-color: lightgray;
+  --control-key-size: 30%;
 }
 .arrowKey {
   position: absolute;
@@ -72,4 +85,49 @@
   border-left: none;
   border-top-right-radius: var(--arrow-key-radius);
   border-bottom-right-radius: var(--arrow-key-radius);
+}
+.controlKeys {
+  width: 40%;
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.controlKey {
+  position: absolute;
+  width: var(--control-key-size);
+  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 100%;
+  transform: translateY(-30%);
+  border: solid black 1px;
+  touch-action: none;
+  &:active,
+  &.pressed {
+    background-color: var(--arrow-key-hover-color);
+  }
+  /* Desktop hover: only for true pointer devices */
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: var(--arrow-key-hover-color);
+    }
+  }
+  /* Touch devices: suppress transitions to avoid fade-out flicker on release */
+  @media (hover: none), (pointer: coarse) {
+    & {
+      transition: none;
+    }
+  }
+}
+
+.controlKeys .a {
+  top: 30%;
+  right: 5%;
+}
+
+.controlKeys .b {
+  top: 50%;
+  right: 45%;
 }

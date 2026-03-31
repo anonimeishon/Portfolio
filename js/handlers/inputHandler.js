@@ -14,13 +14,15 @@ export class InputHandler {
     this.keys = [];
 
     /**
-     * @type {{ ArrowUp: HTMLDivElement, ArrowDown: HTMLDivElement, ArrowLeft: HTMLDivElement, ArrowRight: HTMLDivElement }}
+     * @type {{ ArrowUp: HTMLDivElement, ArrowDown: HTMLDivElement, ArrowLeft: HTMLDivElement, ArrowRight: HTMLDivElement, A: HTMLDivElement, B: HTMLDivElement }}
      */
-    this.virtualArrowKeys = {
+    this.virtualKeys = {
       ArrowUp: arrowKeyUp,
       ArrowDown: arrowKeyDown,
       ArrowLeft: arrowKeyLeft,
       ArrowRight: arrowKeyRight,
+      A: controlKeyA,
+      B: controlKeyB,
     };
 
     const onTouchEnd = (key) => {
@@ -33,11 +35,14 @@ export class InputHandler {
       };
     };
 
-    for (const [key, el] of Object.entries(this.virtualArrowKeys)) {
+    for (const [key, el] of Object.entries(this.virtualKeys)) {
       el.addEventListener('touchstart', (e) => {
         el.classList.add('pressed');
 
-        if (this.keys.indexOf(key) === -1) this.keys.push(key);
+        let pressedKey = key;
+        if (key === 'A') pressedKey = 'Enter'; // map virtual "A" button to "Enter" key
+        if (key === 'B') return; // ignore "B" button for now since it has no in-game function
+        if (this.keys.indexOf(pressedKey) === -1) this.keys.push(pressedKey);
       });
       el.addEventListener('touchend', onTouchEnd(key));
       el.addEventListener('touchcancel', onTouchEnd(key));

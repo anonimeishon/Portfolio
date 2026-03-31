@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constants/game.js';
 import { particles } from './geometry/particles.js';
 import {
   camera,
@@ -11,8 +10,7 @@ import {
 import { scene } from './scene.js';
 import { controls } from './controls/controls.js';
 import { cursor } from './helpers/cursorController.js';
-import { gameCameraAnimation } from './helpers/gameCameraAnimation.js';
-import { resetCameraAnimation } from './helpers/resetCameraAnimation.js';
+import { motion } from './helpers/phoneMotionController.js';
 import { renderer } from './renderer/renderer.js';
 import { directionalLight } from './light/directionalLight.js';
 import { ambientLight } from './light/ambientLight.js';
@@ -44,7 +42,7 @@ export const renderScreen = ({ renderCanvas }) => {
     model.position.set(0, 0, 0);
 
     model.traverse((child) => {
-      console.log('🚀 ~ index.js:47 ~ renderScreen ~ child:', child);
+      console.log('🚀 ~ index.js:45 ~ renderScreen ~ child:', child);
 
       if (child.isMesh && child.parent?.name === 'Screen') {
         // Hide the original atlas-mapped mesh

@@ -4,6 +4,7 @@
   font-weight: normal;
   font-style: normal;
 }
+
 html {
   font-size: 20px;
 }
@@ -11,6 +12,9 @@ body {
   font-family: Pokemon;
   font-size: 1rem;
   user-select: none;
+  margin: 0 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 .header {
   display: flex;
@@ -51,9 +55,6 @@ body {
 }
 
 /* Desktop: hide d-pad */
-.controls {
-  display: none;
-}
 
 @media (max-width: 600px) {
   html {
@@ -68,10 +69,5 @@ body {
   /* Hide keyboard instructions, show d-pad */
   .info {
     display: none;
-  }
-
-  .controls {
-    display: flex;
-    padding: 1rem 0;
   }
 }

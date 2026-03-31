@@ -95,8 +95,7 @@ export const renderScreen = ({ renderCanvas }) => {
     }
 
     // Keep parallax as an offset around the animated base camera pose.
-    const mouseParallaxStrength = 0.5;
-    const phoneParallaxStrength = 0.7;
+    const parallaxStrength = 0.6;
     const motionXNorm = hasMotionBaseline
       ? THREE.MathUtils.clamp((motion.x - motionBaseline.x) / 9.81, -1, 1)
       : 0;
@@ -106,10 +105,10 @@ export const renderScreen = ({ renderCanvas }) => {
 
     const offsetX = animationState.isAnimating
       ? 0
-      : cursor.x * mouseParallaxStrength + motionXNorm * phoneParallaxStrength;
+      : (cursor.x + motionXNorm) * parallaxStrength;
     const offsetY = animationState.isAnimating
       ? 0
-      : -cursor.y * mouseParallaxStrength - motionYNorm * phoneParallaxStrength;
+      : -(cursor.y + motionYNorm) * parallaxStrength;
     const targetX = cameraBasePosition.x + offsetX;
     const targetY = cameraBasePosition.y + offsetY;
     const follow = animationState.isAnimating ? 1 : 0.08;

@@ -9,6 +9,6 @@ export const RESET_CAMERA_ANIMATION = {
 };
 export const GAME_CAMERA_ANIMATION = {
   duration: DEFAULT_CAMERA_ANIMATION_DURATION,
-  toPosition: new Vector3(0, 0.2, 1.3),
+  toPosition: new Vector3(0, 0.2, 1.5),
   toTarget: new Vector3(0, 0.2, 0),
 };

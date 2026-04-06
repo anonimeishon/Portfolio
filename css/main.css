@@ -154,6 +154,7 @@ body {
 }
 .invert {
   filter: invert(1);
+  -webkit-filter: invert(1); /* Legacy Safari support */
 }
 
 @media (max-width: 600px) {

@@ -1,12 +1,16 @@
 :root {
+  /* if element has the .invert class, invert the color codes */
+
   --border-color: #283030;
+  --border-background-color: #ffffff;
 }
 
 .pkbd {
   contain: layout style;
+  color: #000000;
   font-family: Pokemon;
   position: relative;
-  background-color: white;
+  background-color: var(--border-background-color);
   border: 2px solid var(--border-color);
   width: fit-content;
   padding: 0.2em 0.4em;
@@ -37,7 +41,7 @@
   left: -4px;
   right: -4px;
   bottom: -4px;
-  border: 2px solid white;
+  border: 2px solid var(--border-background-color);
 
   /* 2. Force it to sit on top of everything */
   z-index: 10;
@@ -46,8 +50,22 @@
   pointer-events: none;
 
   background-image:
-    linear-gradient(white, white), linear-gradient(white, white),
-    linear-gradient(white, white), linear-gradient(white, white);
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    );
 
   /* Pin them to the extreme corners of this new stretched box */
   background-position:
@@ -79,18 +97,58 @@
     linear-gradient(var(--border-color), var(--border-color)),
     linear-gradient(var(--border-color), var(--border-color)),
     linear-gradient(var(--border-color), var(--border-color)),
-    /* top left start*/ linear-gradient(white, white),
-    linear-gradient(white, white),
-    linear-gradient(white, white),
-    /* top left end*/ /* top right start*/ linear-gradient(white, white),
-    linear-gradient(white, white),
-    linear-gradient(white, white),
-    /* top right end*/ /* bottom left start*/ linear-gradient(white, white),
-    linear-gradient(white, white),
-    linear-gradient(white, white),
-    /* bottom left end*/ /* bottom right start*/ linear-gradient(white, white),
-    linear-gradient(white, white),
-    linear-gradient(white, white),
+    /* top left start*/
+    linear-gradient(
+        var(--border-background-color),
+        var(--border-background-color)
+      ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    /* top left end*/ /* top right start*/
+    linear-gradient(
+        var(--border-background-color),
+        var(--border-background-color)
+      ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    /* top right end*/ /* bottom left start*/
+    linear-gradient(
+        var(--border-background-color),
+        var(--border-background-color)
+      ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    /* bottom left end*/ /* bottom right start*/
+    linear-gradient(
+        var(--border-background-color),
+        var(--border-background-color)
+      ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
+    linear-gradient(
+      var(--border-background-color),
+      var(--border-background-color)
+    ),
     /* bottom right end*/ /* Border lines */
     linear-gradient(to right, var(--border-color), var(--border-color)),
     /* Top border */

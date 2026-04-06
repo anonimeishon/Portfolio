@@ -2,10 +2,16 @@ import { unlockAudio } from './classes/sounds/soundPlayer.js';
 import { gltfModelLoader } from './3d/helpers/gltfLoader.js';
 import { loadingManager } from './utils/loadingManager.js';
 
+let startScreenElement = null;
+
 window.onload = () => {
+  startScreenElement = document.getElementById('startScreen');
   loadingManager.init(
+    startScreenElement,
+    document.getElementById('loadingBarContainer'),
     document.getElementById('loadingBar'),
     document.getElementById('startBtn'),
+    document.getElementById('loadingText'),
   );
 
   gltfModelLoader.instance.loadModel('gameboy');
@@ -35,11 +41,16 @@ const requestPermissions = async () => {
 
   start3DGame({ renderCanvas });
 
-  const screen = document.getElementById('startScreen');
-  screen.classList.add('start-screen--closing');
-  screen.addEventListener('animationend', () => screen.remove(), {
-    once: true,
-  });
+  startScreenElement.classList.add('start-screen-closing');
+  startScreenElement.addEventListener(
+    'animationend',
+    () => {
+      return startScreenElement.remove();
+    },
+    {
+      once: true,
+    },
+  );
 };
 
 window.requestPermissions = requestPermissions;

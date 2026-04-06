@@ -3,6 +3,17 @@ import { ASSETS_BASE } from '../../constants/assets.js';
 const SOUNDS_PATH = `${ASSETS_BASE}sounds`;
 
 /**
+ * Resumes (and immediately closes) a throwaway AudioContext inside a user gesture.
+ * This lifts the browser autoplay restriction page-wide, including for any
+ * AudioContext or HTMLAudioElement created later.
+ */
+export const unlockAudio = async () => {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  await ctx.resume();
+  await ctx.close();
+};
+
+/**
  * @typedef {{ audio: HTMLAudioElement, interval: number }} SoundEntry
  * @typedef {Object.<string, SoundEntry>} SoundMap
  */

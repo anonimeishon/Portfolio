@@ -19,7 +19,69 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
 }
+@property --iris-r {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
 
+@keyframes iris-open {
+  to {
+    --iris-r: 150%;
+  }
+}
+
+.start-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  z-index: 999;
+}
+
+.start-screen--closing {
+  animation: iris-open 0.55s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    transparent var(--iris-r),
+    black var(--iris-r)
+  );
+  mask-image: radial-gradient(
+    circle at center,
+    transparent var(--iris-r),
+    black var(--iris-r)
+  );
+  pointer-events: none;
+}
+.start-screen-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+.loading-bar-container {
+  padding: 0;
+}
+.loading-bar-track {
+  width: 12rem;
+  height: 1.2rem;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+.loading-bar-fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background-color: var(--border-color);
+  transition: width 0.25s ease;
+}
 .tileset-preview::after {
   content: 'Tileset Preview';
   position: absolute;

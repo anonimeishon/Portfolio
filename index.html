@@ -23,6 +23,23 @@
     <script src="js/index.js" type="module"></script>
   </head>
   <body>
+    <div id="startScreen" class="start-screen">
+      <div class="start-screen-content">
+        <div class="pkbd loading-bar-container">
+          <div class="loading-bar-track">
+            <div id="loadingBar" class="loading-bar-fill"></div>
+          </div>
+        </div>
+        <p
+          id="startBtn"
+          onclick="requestPermissions()"
+          class="pkbd pkbd-clickable"
+          hidden
+        >
+          Click to start
+        </p>
+      </div>
+    </div>
     <main class="canvas-container">
       <canvas class="main-canvas" id="renderCanvas" tabindex="0"></canvas>
       <!-- <canvas id="debug-canvas" width="437" height="1240"></canvas> -->

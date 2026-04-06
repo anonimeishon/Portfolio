@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
 import { canvasTexture } from './textures/canvasTexture.js';
 import { dotMatrixMaterialBuilder } from './materials/dotMatrix.js';
@@ -12,8 +11,8 @@ import {
   DPAD_ZONE,
 } from '../constants/threeControls.js';
 import { inputHandler } from '../handlers/inputHandler.js';
+import { gltfModelLoader } from './helpers/gltfLoader.js';
 
-const MODEL_PATH = './assets/models/GBC.glb';
 const CASE_COLOR = 0x8953a9;
 
 /** Frames to keep the A-button press animation active after the key is consumed (~167ms at 60fps). */
@@ -74,7 +73,8 @@ export class GameBoy {
   _bButtonTargetY = 0;
   constructor(world) {
     this._world = world;
-    this._loadModel();
+    const gltf = gltfModelLoader.instance.loadedModels['gameboy'];
+    this._setupModel(gltf.scene);
   }
 
   /** Keep the canvas texture live and lerp button animations every frame. */
@@ -144,26 +144,22 @@ export class GameBoy {
   }
 
   // -----------------------------------------------------------------------
-  // Model loading
+  // Model setup
   // -----------------------------------------------------------------------
 
-  _loadModel() {
-    const loader = new GLTFLoader();
+  _setupModel(gltfScene) {
+    const model = gltfScene;
+    model.scale.set(1, 1, 1);
+    model.position.set(0, 0, 0);
 
-    loader.load(MODEL_PATH, (gltf) => {
-      const model = gltf.scene;
-      model.scale.set(1, 1, 1);
-      model.position.set(0, 0, 0);
-
-      model.traverse((child) => {
-        if (!child.isMesh) return;
-        if (child.parent?.name === 'Case') this._setupCase(child);
-        if (child.parent?.name === 'Screen') this._setupScreen(child);
-        this._tryRegisterButton(child);
-      });
-
-      scene.add(model);
+    model.traverse((child) => {
+      if (!child.isMesh) return;
+      if (child.parent?.name === 'Case') this._setupCase(child);
+      if (child.parent?.name === 'Screen') this._setupScreen(child);
+      this._tryRegisterButton(child);
     });
+
+    scene.add(model);
   }
 
   /** Apply the purple case colour, removing the base-map tint. */

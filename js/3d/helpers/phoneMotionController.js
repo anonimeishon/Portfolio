@@ -6,6 +6,6 @@ export const {
   isMotionEnabled,
   enablePhoneMotion,
   disablePhoneMotion,
-} = createPhoneMotion({
+} = await createPhoneMotion({
   domElement: renderer.domElement,
 });

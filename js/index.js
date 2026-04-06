@@ -1,16 +1,23 @@
 import { unlockAudio } from './classes/sounds/soundPlayer.js';
-import { gltfModelLoader } from './3d/helpers/gltfLoader.js';
+import { setupCameraOrbitButton } from './utils/cameraOrbitButton.js';
+import { preloadGames, startGames } from './utils/gameBootstrap.js';
 import { loadingManager } from './utils/loadingManager.js';
+import { closeStartScreen } from './utils/startScreen.js';
 
 let startScreenElement = null;
+let mainCanvasElement = null;
+let renderCanvasElement = null;
 
 // Module promises kicked off at window.onload so asset loading begins immediately.
 // requestPermissions awaits these — by then the assets may already be ready.
-let _gameEnginePromise = null;
-let _3dGamePromise = null;
+let _preloadedGames = null;
 
 window.onload = () => {
   startScreenElement = document.getElementById('startScreen');
+  mainCanvasElement = document.getElementById('mainCanvas');
+  renderCanvasElement = document.getElementById('renderCanvas');
+
+  setupCameraOrbitButton();
   loadingManager.init(
     startScreenElement,
     document.getElementById('loadingBarContainer'),
@@ -22,9 +29,7 @@ window.onload = () => {
   // Start loading all assets immediately — no user interaction required.
   // The dynamic imports trigger top-level awaits in the module graph
   // (tileset, trainer sprite) so images load in parallel with the GLTF model.
-  gltfModelLoader.instance.loadModel('gameboy');
-  _gameEnginePromise = import('./startGameEngine.js');
-  _3dGamePromise = import('./3d/index.js');
+  _preloadedGames = preloadGames();
 };
 
 const requestPermissions = async () => {
@@ -49,21 +54,16 @@ const requestPermissions = async () => {
 
   // Await the pre-loaded modules. If assets finished loading before the user
   // clicked start, these resolve instantly; otherwise they wait for the remainder.
-  const { startGameEngine } = await _gameEnginePromise;
-  startGameEngine(mainCanvas);
-  const { start3DGame } = await _3dGamePromise;
-  start3DGame({ renderCanvas });
+  if (!_preloadedGames) {
+    _preloadedGames = preloadGames();
+  }
 
-  startScreenElement.classList.add('start-screen-closing');
-  startScreenElement.addEventListener(
-    'animationend',
-    () => {
-      return startScreenElement.remove();
-    },
-    {
-      once: true,
-    },
-  );
+  await startGames(_preloadedGames, {
+    mainCanvas: mainCanvasElement,
+    renderCanvas: renderCanvasElement,
+  });
+
+  closeStartScreen(startScreenElement);
 };
 
 window.requestPermissions = requestPermissions;

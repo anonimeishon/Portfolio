@@ -13,6 +13,9 @@ html {
   user-select: none;
   touch-action: none;
 }
+p {
+  margin: 0;
+}
 body {
   font-size: 1rem;
   -webkit-user-select: none;
@@ -80,6 +83,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
   padding: 0;
 }
 .loading-bar {
@@ -135,20 +139,51 @@ body {
   text-align: center;
 }
 
+.camera-orbit-button {
+  position: relative;
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.camera-orbit-svg {
+  overflow: visible;
+}
+
+.camera-orbit-arrow {
+  transform-box: view-box;
+  transform-origin: 125px 125px;
+  transform: rotate(0deg);
+}
+
+.camera-orbit-image {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
+
 /* Desktop: hide d-pad */
 .info {
+  position: absolute;
   display: flex;
   flex-direction: column;
-  position: absolute;
   top: 0.5rem;
   left: 0.5rem;
+  align-items: flex-start;
 }
+
 .camera-controls {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
   display: flex;
   flex-direction: column;
+  top: 0.5rem;
+  right: 0.5rem;
   align-items: flex-end;
   gap: 1rem;
 }

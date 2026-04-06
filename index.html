@@ -9,6 +9,7 @@
         }
       }
     </script>
+    <!-- "gsap": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" -->
     <meta charset="UTF-8" />
     <meta
       name="viewport"
@@ -48,12 +49,45 @@
     <main class="canvas-container">
       <canvas class="main-canvas" id="renderCanvas" tabindex="0"></canvas>
       <!-- <canvas id="debug-canvas" width="437" height="1240"></canvas> -->
-      <div class="camera-controls">
-        <button class="pkbd pkbd-clickable sm invert" onclick="resetCamera()">
-          Reset Camera
-        </button>
-        <button class="pkbd pkbd-clickable sm invert" onclick="setGameCamera()">
-          Game Camera
+      <div class="camera-controls invert">
+        <button
+          id="cameraOrbitButton"
+          type="button"
+          class="camera-orbit-button"
+          onclick="switchCameraMode()"
+        >
+          <svg
+            id="cameraOrbitSvg"
+            class="camera-orbit-svg"
+            width="65"
+            height="65"
+            viewBox="0 0 250 250"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              id="circle"
+              cx="125"
+              cy="125"
+              r="100"
+              stroke="black"
+              stroke-width="5px"
+              fill="none"
+            ></circle>
+            <path
+              id="cameraOrbitArrow"
+              class="camera-orbit-arrow"
+              fill="black"
+              d="M 210 115 L 240 115 L 224 145 Z"
+            />
+          </svg>
+          <img
+            class="camera-orbit-image"
+            width="34"
+            height="34"
+            alt="Camera Icon"
+            src="assets/icons/camera.svg"
+          />
         </button>
       </div>
       <div class="info" id="info">

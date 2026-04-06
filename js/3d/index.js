@@ -4,17 +4,19 @@ import { GameBoy } from './GameBoy.js';
 import { resetCameraAnimation } from './helpers/resetCameraAnimation.js';
 import { gameCameraAnimation } from './helpers/gameCameraAnimation.js';
 
+let cameraMode = 'reset'; // 'game' or 'reset'
 export const start3DGame = ({ renderCanvas }) => {
-  const resetCamera = () => {
-    resetCameraAnimation();
+  const switchCameraMode = () => {
+    if (cameraMode === 'game') {
+      resetCameraAnimation();
+      cameraMode = 'reset';
+    } else {
+      gameCameraAnimation();
+      cameraMode = 'game';
+    }
   };
 
-  const setGameCamera = () => {
-    gameCameraAnimation();
-  };
-
-  window.resetCamera = resetCamera;
-  window.setGameCamera = setGameCamera;
+  window.switchCameraMode = switchCameraMode;
   renderScreen({ renderCanvas });
 };
 

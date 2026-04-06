@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { particles } from './geometry/particles.js';
+import { particles, updateParticles } from './geometry/particles.js';
 import {
   camera,
   cameraBasePosition,
@@ -43,7 +43,6 @@ export class World {
 
   _motionBaseline = { x: 0, y: 0 };
   _hasMotionBaseline = false;
-
   constructor() {
     scene.background = new THREE.Color(0x000000);
     scene.add(directionalLight, ambientLight, particles);
@@ -206,6 +205,7 @@ export class World {
     for (const entity of this._entities) entity.onFrame?.();
 
     controls.update();
+    updateParticles(camera.position);
     renderer.render(scene, camera);
   };
 

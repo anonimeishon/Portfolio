@@ -1,4 +1,4 @@
-export const createPhoneMotion = async ({ domElement }) => {
+export const createPhoneMotion = ({ domElement }) => {
   const motion = { x: 0, y: 0, z: 0 };
   let isEnabled = false;
 
@@ -13,14 +13,17 @@ export const createPhoneMotion = async ({ domElement }) => {
   const enablePhoneMotion = async () => {
     if (isEnabled) return;
 
-    if (typeof DeviceMotionEvent?.requestPermission === 'function') {
-      const permission = await DeviceMotionEvent.requestPermission();
+    try {
+      if (typeof DeviceMotionEvent?.requestPermission === 'function') {
+        const permission = await DeviceMotionEvent.requestPermission();
+        if (permission !== 'granted') return;
+      }
 
-      if (permission !== 'granted') return;
+      window.addEventListener('devicemotion', phoneMotionHandler);
+      isEnabled = true;
+    } catch {
+      // Permission denied or API unavailable — motion stays zeroed, nothing breaks.
     }
-
-    window.addEventListener('devicemotion', phoneMotionHandler);
-    isEnabled = true;
   };
 
   const disablePhoneMotion = () => {
@@ -32,6 +35,7 @@ export const createPhoneMotion = async ({ domElement }) => {
     motion.y = 0;
     motion.z = 0;
   };
+
   enablePhoneMotion();
 
   return {

@@ -49,11 +49,11 @@
     <main class="canvas-container">
       <canvas class="main-canvas" id="renderCanvas" tabindex="0"></canvas>
       <!-- <canvas id="debug-canvas" width="437" height="1240"></canvas> -->
-      <div class="camera-controls">
+      <div class="camera-controls invert">
         <button
           id="cameraSwitchButton"
           type="button"
-          class="camera-orbit-button"
+          class="camera-orbit-button pkbd"
           onclick="switchCameraMode()"
         >
           <svg
@@ -70,20 +70,7 @@
               y="0"
               width="250"
               height="250"
-              fill="white"
-              rx="4"
-              ry="4"
-            ></rect>
-
-            <rect
-              id="rectBorder"
-              x="0"
-              y="0"
-              width="250"
-              height="250"
-              stroke="white"
-              stroke-width="10px"
-              fill="none"
+              fill="black"
               rx="4"
               ry="4"
             ></rect>

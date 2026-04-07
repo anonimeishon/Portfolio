@@ -182,10 +182,10 @@ body {
   transform: translate(-50%, -50%);
   transition: filter 0.3s ease; /* Smooth color transition */
   pointer-events: none;
-  filter: invert(0);
+  filter: invert(1);
 }
 .is-active .camera-orbit-image {
-  filter: invert(1);
+  filter: invert(0);
 }
 /* Desktop: hide d-pad */
 .info {

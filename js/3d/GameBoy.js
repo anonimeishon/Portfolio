@@ -16,8 +16,8 @@ import { screenLight } from './light/screenPointLight.js';
 
 const CASE_COLOR = 0x8953a9;
 
-/** Frames to keep the A-button press animation active after the key is consumed (~167ms at 60fps). */
-const PRESS_ANIM_FRAMES = 10;
+/** Duration (ms) to keep the A-button press animation active after the key is consumed (~167ms). */
+const PRESS_ANIM_DURATION_MS = 167;
 
 /**
  * GameBoy — standalone entity representing the GBC model.
@@ -62,8 +62,8 @@ export class GameBoy {
   /** True while a touch/pointer press is driving the A button. */
   _touchingA = false;
 
-  /** Frame countdown that holds the A press animation long enough for the lerp to converge. */
-  _aPressAnimFrames = 0;
+  /** Millisecond countdown that holds the A press animation long enough for the lerp to converge. */
+  _aPressAnimRemainingMs = 0;
 
   /** Resting Y positions captured from the mesh after the model loads. */
   _aButtonRestY = 0;
@@ -79,12 +79,12 @@ export class GameBoy {
   }
 
   /** Keep the canvas texture live and lerp button animations every frame. */
-  onFrame() {
+  onFrame(deltaSeconds) {
     canvasTexture.needsUpdate = true;
-    this._syncKeyboardState();
-    this._lerpDpad();
-    this._lerpButtonY(this.aButton, this._aButtonTargetY);
-    this._lerpButtonY(this.bButton, this._bButtonTargetY);
+    this._syncKeyboardState(deltaSeconds);
+    this._lerpDpad(deltaSeconds);
+    this._lerpButtonY(this.aButton, this._aButtonTargetY, deltaSeconds);
+    this._lerpButtonY(this.bButton, this._bButtonTargetY, deltaSeconds);
   }
 
   /**
@@ -363,24 +363,24 @@ export class GameBoy {
    * Smoothly interpolate the dpad mesh rotation toward the current target.
    * Called every frame so the tilt eases in on press and eases out on release.
    */
-  _lerpDpad() {
+  _lerpDpad(deltaSeconds) {
     if (!this.dpad) return;
-    const speed = 0.18;
-    this.dpad.rotation.x += (this._dpadTarget.x - this.dpad.rotation.x) * speed;
-    this.dpad.rotation.z += (this._dpadTarget.z - this.dpad.rotation.z) * speed;
+    const alpha = 1 - Math.exp(-10 * deltaSeconds);
+    this.dpad.rotation.x += (this._dpadTarget.x - this.dpad.rotation.x) * alpha;
+    this.dpad.rotation.z += (this._dpadTarget.z - this.dpad.rotation.z) * alpha;
   }
 
-  _lerpButtonY(buttonMesh, targetY) {
+  _lerpButtonY(buttonMesh, targetY, deltaSeconds) {
     if (!buttonMesh) return;
-    const speed = 0.18;
-    buttonMesh.position.y += (targetY - buttonMesh.position.y) * speed;
+    const alpha = 1 - Math.exp(-10 * deltaSeconds);
+    buttonMesh.position.y += (targetY - buttonMesh.position.y) * alpha;
   }
 
   /**
    * Mirror the current keyboard state onto the dpad/button animation targets
    * so that physical key presses drive the same visual feedback as touch presses.
    */
-  _syncKeyboardState() {
+  _syncKeyboardState(deltaSeconds) {
     const keys = inputHandler.instance?.keys;
 
     if (!keys) return;
@@ -413,14 +413,14 @@ export class GameBoy {
     // A button — hold the pressed target for several frames so the lerp fully converges
     // even when consumeKey() removes the key before the next sync tick.
     if (a) {
-      this._aPressAnimFrames = PRESS_ANIM_FRAMES;
-    } else if (this._aPressAnimFrames > 0) {
-      this._aPressAnimFrames--;
+      this._aPressAnimRemainingMs = PRESS_ANIM_DURATION_MS;
+    } else if (this._aPressAnimRemainingMs > 0) {
+      this._aPressAnimRemainingMs -= deltaSeconds * 1000;
     }
 
     if (!this._touchingA) {
       this._aButtonTargetY =
-        this._aPressAnimFrames > 0
+        this._aPressAnimRemainingMs > 0
           ? this._aButtonRestY + BUTTON_PRESS_DEPTH
           : this._aButtonRestY;
     }

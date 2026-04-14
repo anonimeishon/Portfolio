@@ -1,5 +1,6 @@
 import { World } from './GameWorld.js';
 import { GameBoy } from './GameBoy.js';
+import { Button } from './Button.js';
 
 import { resetCameraAnimation } from './helpers/resetCameraAnimation.js';
 import { gameCameraAnimation } from './helpers/gameCameraAnimation.js';
@@ -24,5 +25,13 @@ const renderScreen = ({ renderCanvas }) => {
   const world = new World();
 
   world.add(new GameBoy(world));
+
+  // world.add(
+  //   new Button(world, {
+  //     labelType: 'icon',
+  //     iconPath: 'assets/icons/camera.svg',
+  //   }),
+  // );
+
   world.startLoop(renderCanvas);
 };

@@ -43,6 +43,7 @@ export class World {
 
   _motionBaseline = { x: 0, y: 0 };
   _hasMotionBaseline = false;
+  _lastTime = 0;
   constructor() {
     scene.background = new THREE.Color(0x000000);
     scene.add(directionalLight, ambientLight, particles);
@@ -88,7 +89,7 @@ export class World {
    */
   startLoop(renderCanvas) {
     this._bindPointerEvents();
-    this._animate();
+    requestAnimationFrame(this._animate);
     window.addEventListener('resize', () => this._onResize(renderCanvas));
     this._onResize(renderCanvas);
   }
@@ -115,6 +116,9 @@ export class World {
     this._raycaster.setFromCamera(this._pointer, camera);
     const meshes = [...this._meshToEntity.keys()];
     const hits = this._raycaster.intersectObjects(meshes, true);
+
+    console.log('🚀 ~ GameWorld.js:120 ~ World ~ _getHit ~ hits:', hits);
+
     return hits[0] ?? null;
   }
 
@@ -124,7 +128,7 @@ export class World {
 
     const entity = this._meshToEntity.get(intersection.object);
     if (!entity) return;
-
+    entity?.hit?.(event);
     const key = entity.resolveKey(intersection);
     if (!key) return;
 
@@ -162,8 +166,11 @@ export class World {
   // Animation loop
   // -----------------------------------------------------------------------
 
-  _animate = () => {
+  _animate = (timestamp) => {
     requestAnimationFrame(this._animate);
+
+    const deltaSeconds = Math.min((timestamp - this._lastTime) / 1000, 0.1);
+    this._lastTime = timestamp;
 
     const animationState = getCameraAnimationState();
 
@@ -194,15 +201,20 @@ export class World {
 
     const targetX = cameraBasePosition.x + offsetX;
     const targetY = cameraBasePosition.y + offsetY;
-    const follow = animationState.isAnimating ? 1 : 0.08;
-
-    camera.position.x += (targetX - camera.position.x) * follow;
-    camera.position.y += (targetY - camera.position.y) * follow;
-    camera.position.z += (cameraBasePosition.z - camera.position.z) * follow;
+    if (animationState.isAnimating) {
+      camera.position.x = targetX;
+      camera.position.y = targetY;
+      camera.position.z = cameraBasePosition.z;
+    } else {
+      const alpha = 1 - Math.exp(-5 * deltaSeconds);
+      camera.position.x += (targetX - camera.position.x) * alpha;
+      camera.position.y += (targetY - camera.position.y) * alpha;
+      camera.position.z += (cameraBasePosition.z - camera.position.z) * alpha;
+    }
 
     controls.target.copy(cameraTarget);
 
-    for (const entity of this._entities) entity.onFrame?.();
+    for (const entity of this._entities) entity.onFrame?.(deltaSeconds);
 
     controls.update();
     updateParticles(camera.position);

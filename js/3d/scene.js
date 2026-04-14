@@ -1,6 +1,9 @@
 import { Scene } from 'three';
 
 export class SceneContext {
+  /**
+   * @type {Scene}
+   */
   _scene = null;
 
   constructor() {

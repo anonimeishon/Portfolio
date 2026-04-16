@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { scene } from './scene.js';
+import { scene } from '../scene.js';
 import { canvasTexture } from './textures/canvasTexture.js';
 import { dotMatrixMaterialBuilder } from './materials/dotMatrix.js';
 import {
@@ -9,9 +9,9 @@ import {
   CONTROL_KEYS,
   DPAD_ROTATION_ANGLE,
   DPAD_ZONE,
-} from '../constants/threeControls.js';
-import { inputHandler } from '../handlers/inputHandler.js';
-import { gltfModelLoader } from './helpers/gltfLoader.js';
+} from '../../../constants/threeControls.js';
+import { inputHandler } from '../../../handlers/inputHandler.js';
+import { gltfModelLoader } from '../../helpers/gltfLoader.js';
 import { screenLight } from './light/screenPointLight.js';
 
 const CASE_COLOR = 0x8953a9;

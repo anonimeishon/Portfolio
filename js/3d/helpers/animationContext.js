@@ -4,8 +4,8 @@ import {
   cameraTarget,
   finishCameraAnimation,
   getCameraAnimationState,
-} from '../camera/camera.js';
-import { controls } from '../controls/controls.js';
+} from '../components/camera/camera.js';
+import { controls } from '../components/controls/controls.js';
 
 export const animationContext = {
   controls,

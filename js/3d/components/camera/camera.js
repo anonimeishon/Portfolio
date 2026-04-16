@@ -1,6 +1,6 @@
 import { PerspectiveCamera, Vector3 } from 'three';
 
-import { INITIAL_CAMERA_POSITION } from '../../constants/three.js';
+import { INITIAL_CAMERA_POSITION } from '../../../constants/three.js';
 
 export class CameraRig {
   _camera = null;

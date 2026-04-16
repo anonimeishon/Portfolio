@@ -1,4 +1,4 @@
-import { renderer } from '../renderer/renderer.js';
+import { renderer } from '../components/renderer/renderer.js';
 import { createPhoneMotion } from './phoneMotion.js';
 
 export const {

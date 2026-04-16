@@ -1,10 +1,58 @@
-import { ASSETS_BASE } from '../constants/assets.js';
+import { ASSETS_BASE } from '../../constants/assets.js';
 import { World } from './GameWorld.js';
 import { scene } from './scene.js';
-import { camera } from './camera/camera.js';
 import * as THREE from 'three';
+import { loadingManager } from '../../utils/loadingManager.js';
+import { SceneObject } from './SceneObject.js';
 
-export class Button {
+/** @type {THREE.Texture | null} */
+let _cachedTexture = null;
+/** @type {Record<string, HTMLImageElement>} */
+const _cachedIcons = {};
+
+export const preloadButtonAssets = (iconPath) => {
+  const promises = [];
+
+  const onTextureProgress = loadingManager.register('buttonTexture');
+  const texturePromise = new Promise((resolve) => {
+    new THREE.TextureLoader().load(
+      `${ASSETS_BASE}/button.png`,
+      (texture) => {
+        texture.magFilter = THREE.LinearFilter;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        _cachedTexture = texture;
+        onTextureProgress?.(100);
+        resolve();
+      },
+      (xhr) => {
+        if (xhr.total > 0) onTextureProgress?.((xhr.loaded / xhr.total) * 100);
+      },
+    );
+  });
+  promises.push(texturePromise);
+
+  if (iconPath) {
+    const onIconProgress = loadingManager.register('buttonIcon');
+    const iconPromise = new Promise((resolve) => {
+      const image = new Image();
+      image.onload = () => {
+        _cachedIcons[iconPath] = image;
+        onIconProgress?.(100);
+        resolve();
+      };
+      image.onerror = () => {
+        onIconProgress?.(100);
+        resolve();
+      };
+      image.src = iconPath;
+    });
+    promises.push(iconPromise);
+  }
+
+  return Promise.all(promises);
+};
+
+export class Button extends SceneObject {
   /**
    * @type {scene}
    */
@@ -29,7 +77,7 @@ export class Button {
    */
   _world = null;
   /**
-   * @type {THREE.Sprite | null}
+   * @type {THREE.Object3D | null}
    */
   label = null;
 
@@ -38,16 +86,11 @@ export class Button {
   _labelType = 'text';
   _labelText = 'START';
   _iconPath = `${ASSETS_BASE}/icons/camera.svg`;
-  _anchorDistance = 2;
-  _anchorMarginX = 0.15;
-  _anchorMarginY = 0.15;
-
-  _cameraRight = new THREE.Vector3();
-  _cameraUp = new THREE.Vector3();
-  _cameraForward = new THREE.Vector3();
-  _anchorPoint = new THREE.Vector3();
 
   constructor(world, options = {}) {
+    super({
+      anchor: { enabled: false, distance: 2, marginX: 0.15, marginY: 0.15 },
+    });
     this._scene = scene;
     this._world = world;
 
@@ -60,23 +103,31 @@ export class Button {
       this._iconPath = options.iconPath ?? `${ASSETS_BASE}/icons/camera.svg`;
     }
 
-    const map = new THREE.TextureLoader().load(`${ASSETS_BASE}/button.png`);
-    map.magFilter = THREE.LinearFilter;
-    map.colorSpace = THREE.SRGBColorSpace;
+    const map =
+      _cachedTexture ??
+      (() => {
+        const t = new THREE.TextureLoader().load(`${ASSETS_BASE}/button.png`);
+        t.magFilter = THREE.LinearFilter;
+        t.colorSpace = THREE.SRGBColorSpace;
+        return t;
+      })();
     this.material = new THREE.MeshBasicMaterial({
       map: map,
       opacity: 1,
+      transparent: true,
       depthTest: false,
       depthWrite: false,
     });
-    this.geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1, 1, 1, 1);
+    this.geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2, 1, 1, 1);
     this.mesh = new THREE.Mesh(this.geometry, this.material);
+    this.mesh.position.set(0.7, 1.5, 0.1);
     this.mesh.renderOrder = 1000;
-    this._updateScreenAnchor();
+    // this._updateScreenAnchor();
     this._baseY = this.mesh.position.y;
     this._scene.add(this.mesh);
     this._world.registerMesh(this.mesh, this);
-
+    // this.mesh.quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI * 1.15, 0)) ;
+    // this.mesh.rotation.z = Math.PI * 1.25;
     if (this._labelType === 'icon') {
       this._buildIconLabel(this._iconPath).then((label) => {
         if (!label) return;
@@ -92,33 +143,6 @@ export class Button {
         this._world.registerMesh(label, this);
       });
     }
-  }
-
-  _updateScreenAnchor() {
-    const distance = this._anchorDistance;
-    const halfHeight =
-      Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) * distance;
-    const halfWidth = halfHeight * camera.aspect;
-
-    const offsetRight = halfWidth - this._anchorMarginX;
-    const offsetUp = halfHeight - this._anchorMarginY;
-
-    camera.getWorldDirection(this._cameraForward);
-    this._cameraForward.normalize();
-
-    this._cameraRight
-      .set(1, 0, 0)
-      .applyQuaternion(camera.quaternion)
-      .normalize();
-    this._cameraUp.set(0, 1, 0).applyQuaternion(camera.quaternion).normalize();
-
-    this._anchorPoint
-      .copy(camera.position)
-      .addScaledVector(this._cameraForward, distance)
-      .addScaledVector(this._cameraRight, offsetRight)
-      .addScaledVector(this._cameraUp, -offsetUp);
-
-    this.mesh.position.copy(this._anchorPoint);
   }
 
   async _buildTextLabel(labelText) {
@@ -152,6 +176,7 @@ export class Button {
 
     const material = new THREE.SpriteMaterial({
       map: texture,
+      opacity: 1,
       transparent: true,
       depthTest: false,
       depthWrite: false,
@@ -167,61 +192,60 @@ export class Button {
   }
 
   async _buildIconLabel(iconPath) {
-    const image = await this._loadImage(iconPath);
+    const image = _cachedIcons[iconPath] ?? (await this._loadImage(iconPath));
     if (!image) return null;
 
+    const size = 128;
     const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
+    canvas.width = size;
+    canvas.height = size;
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, size, size);
 
-    // Draw a white outline by stamping a white-tinted icon around the center,
-    // then draw the original icon on top.
-    const iconMaskCanvas = document.createElement('canvas');
-    iconMaskCanvas.width = canvas.width;
-    iconMaskCanvas.height = canvas.height;
-    const iconMaskCtx = iconMaskCanvas.getContext('2d');
-    if (!iconMaskCtx) return null;
-    iconMaskCtx.clearRect(0, 0, iconMaskCanvas.width, iconMaskCanvas.height);
-    iconMaskCtx.drawImage(
-      image,
-      0,
-      64,
-      iconMaskCanvas.width / 2,
-      iconMaskCanvas.height / 2,
-    );
-    iconMaskCtx.globalCompositeOperation = 'source-in';
-    iconMaskCtx.fillStyle = '#ffffff';
-    iconMaskCtx.fillRect(0, 0, iconMaskCanvas.width, iconMaskCanvas.height);
-    iconMaskCtx.globalCompositeOperation = 'source-over';
+    // Build white mask of the icon
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = size;
+    maskCanvas.height = size;
+    const maskCtx = maskCanvas.getContext('2d');
+    if (!maskCtx) return null;
+    const drawSize = Math.floor(size * 0.62);
+    const drawOffset = Math.floor((size - drawSize) / 2);
+    maskCtx.drawImage(image, drawOffset, drawOffset, drawSize, drawSize);
+    maskCtx.globalCompositeOperation = 'source-in';
+    maskCtx.fillStyle = '#ffffff';
+    maskCtx.fillRect(0, 0, size, size);
 
+    // Stamp white outline around the icon
     const outlineRadius = 5;
     for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 12) {
       const dx = Math.round(Math.cos(angle) * outlineRadius);
       const dy = Math.round(Math.sin(angle) * outlineRadius);
-      ctx.drawImage(iconMaskCanvas, dx, dy, canvas.width, canvas.height);
+      ctx.drawImage(maskCanvas, dx, dy, size, size);
     }
 
-    ctx.drawImage(image, 0, 64, canvas.width / 2, canvas.height / 2);
+    // Draw the original icon on top
+    ctx.drawImage(image, drawOffset, drawOffset, drawSize, drawSize);
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.needsUpdate = true;
 
-    const material = new THREE.SpriteMaterial({
+    const material = new THREE.MeshBasicMaterial({
       map: texture,
+      opacity: 1,
       transparent: true,
       depthTest: false,
       depthWrite: false,
+      side: THREE.FrontSide,
     });
 
-    const label = new THREE.Sprite(material);
+    // Sticker plane mounted on the front face of the button.
+    const label = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.15), material);
     label.renderOrder = 1001;
-    label.scale.set(0.14, 0.14, 1);
-    label.position.set(0.1, 0, 0);
+    // Position just above the front face (box depth is 0.2, half-depth is 0.1).
+    label.position.set(0, 0, 0.101);
     return label;
   }
 
@@ -235,11 +259,11 @@ export class Button {
   }
 
   hit(e) {
-    window.switchCameraMode();
-    for (let i = 0; i < 8; i++) {
+    window.switchCameraMode?.();
+    for (let i = 0; i < 16; i++) {
       setTimeout(() => {
         this.mesh.rotation.x += Math.PI / 8;
-        this.mesh.rotation.y += Math.PI / 8;
+        // this.mesh.rotation.y += Math.PI / 8;
       }, i * 50);
     }
   }
@@ -248,8 +272,8 @@ export class Button {
   }
   onFrame(deltaSeconds) {
     this._elapsedTime += deltaSeconds;
-    this._updateScreenAnchor();
+    super.onFrame(deltaSeconds);
     this._baseY = this.mesh.position.y;
-    this.mesh.position.y = this._baseY + Math.sin(this._elapsedTime * 2) * 0.01;
+    // this.mesh.position.y = this._baseY + Math.sin(this._elapsedTime * 2) * 0.01;
   }
 }

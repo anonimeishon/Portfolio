@@ -1,23 +1,19 @@
-import { World } from './GameWorld.js';
-import { GameBoy } from './GameBoy.js';
-import { Button } from './Button.js';
+import { World } from './components/GameWorld.js';
+import { GameBoy } from './components/gameboy/GameBoy.js';
+import { Button } from './components/Button.js';
 
-import { resetCameraAnimation } from './helpers/resetCameraAnimation.js';
-import { gameCameraAnimation } from './helpers/gameCameraAnimation.js';
+import { cameraButtonState } from './helpers/cameraButtonState.js';
+import { switchToGame } from './helpers/switchToGame.js';
+import { switchToReset } from './helpers/switchToReset.js';
+import { createInstructionsText } from './components/text/instructionsText.js';
+import { createInstructionsArrow } from './components/text/instructionsArrow.js';
+import { createInstructionsControls } from './components/text/instructionsControls.js';
 
-let cameraMode = 'reset'; // 'game' or 'reset'
 export const start3DGame = ({ renderCanvas }) => {
-  const switchCameraMode = () => {
-    if (cameraMode === 'game') {
-      resetCameraAnimation();
-      cameraMode = 'reset';
-    } else {
-      gameCameraAnimation();
-      cameraMode = 'game';
-    }
+  window.switchCameraMode = () => {
+    if (cameraButtonState.cameraMode === 'game') switchToReset();
+    else switchToGame();
   };
-
-  window.switchCameraMode = switchCameraMode;
   renderScreen({ renderCanvas });
 };
 
@@ -25,13 +21,14 @@ const renderScreen = ({ renderCanvas }) => {
   const world = new World();
 
   world.add(new GameBoy(world));
-
-  // world.add(
-  //   new Button(world, {
-  //     labelType: 'icon',
-  //     iconPath: 'assets/icons/camera.svg',
-  //   }),
-  // );
+  world.add(createInstructionsText());
+  world.add(createInstructionsArrow());
+  world.add(createInstructionsControls());
+  cameraButtonState.button = new Button(world, {
+    labelType: 'icon',
+    iconPath: 'assets/icons/camera.svg',
+  });
+  world.add(cameraButtonState.button);
 
   world.startLoop(renderCanvas);
 };

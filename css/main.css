@@ -205,6 +205,9 @@ body {
   right: 0.5rem;
   align-items: flex-end;
   gap: 1rem;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 .invert {
   filter: invert(1);
@@ -228,10 +231,15 @@ body {
   .camera-controls {
     flex-direction: row;
   }
+
   .sm {
     font-size: 0.7rem;
   }
   .md {
     font-size: 1rem;
   }
+}
+
+.hidden {
+  visibility: hidden;
 }

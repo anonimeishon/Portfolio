@@ -49,7 +49,7 @@
     <main class="canvas-container">
       <canvas class="main-canvas" id="renderCanvas" tabindex="0"></canvas>
       <!-- <canvas id="debug-canvas" width="437" height="1240"></canvas> -->
-      <div class="camera-controls invert">
+      <div class="camera-controls invert" id="htmlCameraControls">
         <button
           id="cameraSwitchButton"
           type="button"
@@ -82,11 +82,6 @@
             src="assets/icons/camera.svg"
           />
         </button>
-      </div>
-      <div class="info" id="info">
-        <p class="pkbd sm invert">
-          Controls: Arrow keys to move, Enter key to interact
-        </p>
       </div>
     </main>
     <div class="canvas-container game-container">

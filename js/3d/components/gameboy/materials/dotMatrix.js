@@ -1,5 +1,5 @@
 import { ShaderMaterial, Vector2, Color } from 'three';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../constants/game.js';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../constants/game.js';
 
 export const dotMatrixMaterialBuilder = (texture) => {
   const dotMatrixMaterial = new ShaderMaterial({

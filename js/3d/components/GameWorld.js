@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { particles, updateParticles } from './geometry/particles.js';
+import { particles, updateParticles } from './particles/geometry/particles.js';
 import {
   camera,
   cameraBasePosition,
@@ -8,8 +8,8 @@ import {
 } from './camera/camera.js';
 import { scene } from './scene.js';
 import { controls } from './controls/controls.js';
-import { cursor } from './helpers/cursorController.js';
-import { motion, isMotionEnabled } from './helpers/phoneMotionController.js';
+import { cursor } from '../helpers/cursorController.js';
+import { motion, isMotionEnabled } from '../helpers/phoneMotionController.js';
 import { renderer, composer } from './renderer/renderer.js';
 import { directionalLight } from './light/directionalLight.js';
 import { ambientLight } from './light/ambientLight.js';
@@ -60,6 +60,15 @@ export class World {
    */
   add(entity) {
     this._entities.push(entity);
+    entity.onAddedToWorld?.(this);
+    return this;
+  }
+
+  remove(entity) {
+    const index = this._entities.indexOf(entity);
+    if (index !== -1) {
+      this._entities.splice(index, 1);
+    }
     return this;
   }
 
@@ -117,7 +126,7 @@ export class World {
     const meshes = [...this._meshToEntity.keys()];
     const hits = this._raycaster.intersectObjects(meshes, true);
 
-    console.log('🚀 ~ GameWorld.js:120 ~ World ~ _getHit ~ hits:', hits);
+    console.log('🚀 ~ GameWorld.js:129 ~ World ~ _getHit ~ hits:', hits);
 
     return hits[0] ?? null;
   }
@@ -201,16 +210,11 @@ export class World {
 
     const targetX = cameraBasePosition.x + offsetX;
     const targetY = cameraBasePosition.y + offsetY;
-    if (animationState.isAnimating) {
-      camera.position.x = targetX;
-      camera.position.y = targetY;
-      camera.position.z = cameraBasePosition.z;
-    } else {
-      const alpha = 1 - Math.exp(-5 * deltaSeconds);
-      camera.position.x += (targetX - camera.position.x) * alpha;
-      camera.position.y += (targetY - camera.position.y) * alpha;
-      camera.position.z += (cameraBasePosition.z - camera.position.z) * alpha;
-    }
+    const alpha =
+      1 - Math.exp(-(animationState.isAnimating ? 30 : 5) * deltaSeconds);
+    camera.position.x += (targetX - camera.position.x) * alpha;
+    camera.position.y += (targetY - camera.position.y) * alpha;
+    camera.position.z += (cameraBasePosition.z - camera.position.z) * alpha;
 
     controls.target.copy(cameraTarget);
 

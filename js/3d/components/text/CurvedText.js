@@ -63,7 +63,9 @@ export class CurvedText extends Text {
 
     lines.forEach((line, lineIndex) => {
       const lineRadius = radius + lineIndex * this.size * lineGap;
-      outerGroup.add(this._buildLine(line, lineRadius, angle, centerVec, fillColor));
+      outerGroup.add(
+        this._buildLine(line, lineRadius, angle, centerVec, fillColor),
+      );
     });
 
     outerGroup.rotation.z = (tilt * Math.PI) / 180;
@@ -100,12 +102,14 @@ export class CurvedText extends Text {
       const placementAngle = a + charAngle / 2;
 
       // ── Per-character canvas ──────────────────────────────────────────────
+      const dpr = Math.min(window.devicePixelRatio || 1, 3);
       const cw = Math.max(1, Math.ceil(charWidths[i]) + STROKE_PAD * 2);
       const ch = FONT_SIZE + STROKE_PAD * 2;
       const canvas = document.createElement('canvas');
-      canvas.width = cw;
-      canvas.height = ch;
+      canvas.width = cw * dpr;
+      canvas.height = ch * dpr;
       const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
       ctx.font = `${FONT_SIZE}px Pokemon`;
       ctx.textBaseline = 'top';
       ctx.lineJoin = 'round';
@@ -128,7 +132,10 @@ export class CurvedText extends Text {
 
       const planeH = this.size;
       const planeW = planeH * (cw / ch);
-      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), material);
+      const mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(planeW, planeH),
+        material,
+      );
 
       mesh.position.set(
         center.x + radius * Math.cos(placementAngle),

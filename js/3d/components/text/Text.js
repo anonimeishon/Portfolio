@@ -38,8 +38,9 @@ export class Text extends SceneObject {
   }
 
   build() {
-    const fontSize = 64;
-    const border = 12;
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+    const fontSize = 64 * dpr;
+    const border = 12 * dpr;
     const padding = border * 2;
 
     const fillColor = '#' + this.color.toString(16).padStart(6, '0');

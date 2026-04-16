@@ -4,6 +4,8 @@ const ALLOWED_KEYS = [
   'ArrowLeft',
   'ArrowRight',
   'Enter',
+  'p',
+  'Start',
 ];
 
 /**

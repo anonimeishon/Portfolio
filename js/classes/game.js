@@ -5,6 +5,7 @@ import { InputHandler } from '../handlers/inputHandler.js';
 import { Player } from './player.js';
 import { maps } from '../maps/index.js';
 import { State } from './state.js';
+import { Menu } from './menu.js';
 
 export class Game {
   /**
@@ -29,6 +30,9 @@ export class Game {
       this.state.player.direction,
     );
     this.input = InputHandler.init();
+    this.menu = new Menu([
+      { label: 'CAMERA', action: () => window.switchCameraMode?.() },
+    ]);
     this.fps = 30;
     this.frameInterval = 1000 / this.fps;
     this.lastTime = 0;
@@ -52,6 +56,19 @@ export class Game {
     if (this.state.activeEvent) {
       this.state.activeEvent.dialog.update(this);
       return; // block movement during dialog
+    }
+    // Toggle menu on p or Start
+    if (this.input.keys.includes('p') || this.input.keys.includes('Start')) {
+      if (!this.menu.isOpen) {
+        this.input.consumeKey('p');
+        this.input.consumeKey('Start');
+        this.menu.open();
+        return;
+      }
+    }
+    if (this.menu.isOpen) {
+      this.menu.update(this);
+      return; // block player movement while menu is open
     }
     this.player.update(this.input.keys, deltaTime, fps);
     this._checkInteraction();
@@ -86,6 +103,7 @@ export class Game {
       this.map.portal.drawTransition(context, this.width, this.height, this);
     if (this.state.activeEvent)
       this.state.activeEvent.dialog.draw(context, this);
+    this.menu.draw(context, this);
   }
   animate(context, timeStamp = 0) {
     const deltaTime = timeStamp - this.lastTime;

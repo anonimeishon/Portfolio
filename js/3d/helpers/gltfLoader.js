@@ -32,6 +32,7 @@ export class GltfModelLoader {
     this.loader = new GLTFLoader();
     this.unloadedModels = {
       gameboy: `${ASSETS_BASE}/models/GBC.glb`,
+      // gameboy: `${ASSETS_BASE}/models/GBC_complete_file.glb`,
     };
     this.loadedModels = {};
     this.loadingPromises = {};

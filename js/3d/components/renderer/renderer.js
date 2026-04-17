@@ -7,6 +7,9 @@ import { scene } from '../scene.js';
 import { camera } from '../camera/camera.js';
 
 export class RendererContext {
+  /**
+   * @type {WebGLRenderer}
+   */
   _renderer = null;
   _composer = null;
 
@@ -16,7 +19,11 @@ export class RendererContext {
       antialias: true,
     });
 
+    const DPR = window.devicePixelRatio || 2;
     this._renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+    this._renderer.setPixelRatio(Math.min(DPR));
+
     this._renderer.toneMapping = ACESFilmicToneMapping;
     this._renderer.toneMappingExposure = 1;
 

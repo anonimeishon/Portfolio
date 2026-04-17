@@ -13,7 +13,6 @@ import {
 import { inputHandler } from '../../../handlers/inputHandler.js';
 import { gltfModelLoader } from '../../helpers/gltfLoader.js';
 import { screenLight } from './light/screenPointLight.js';
-
 const CASE_COLOR = 0x8953a9;
 
 /** Duration (ms) to keep the A-button press animation active after the key is consumed (~167ms). */
@@ -74,6 +73,9 @@ export class GameBoy {
   _bButtonTargetY = 0;
   constructor(world) {
     this._world = world;
+    /**
+     * @type {import('three/examples/jsm/loaders/GLTFLoader').GLTF}
+     */
     const gltf = gltfModelLoader.instance.loadedModels['gameboy'];
     this._setupModel(gltf.scene);
   }
@@ -151,6 +153,9 @@ export class GameBoy {
   // Model setup
   // -----------------------------------------------------------------------
 
+  /**
+   * @param {import('three/examples/jsm/loaders/GLTFLoader').GLTF['scene']} gltfScene
+   */
   _setupModel(gltfScene) {
     const model = gltfScene;
     model.scale.set(1, 1, 1);
@@ -158,6 +163,7 @@ export class GameBoy {
 
     model.traverse((child) => {
       if (!child.isMesh) return;
+
       if (child.parent?.name === 'Case') this._setupCase(child);
       if (child.parent?.name === 'Screen') this._setupScreen(child);
       this._tryRegisterButton(child);
@@ -169,8 +175,15 @@ export class GameBoy {
   /** Apply the purple case colour, removing the base-map tint. */
   _setupCase(child) {
     const material = child.material;
-    if ('map' in material) material.map = null;
-    if ('color' in material) material.color = new THREE.Color(CASE_COLOR);
+
+    material.metalness = 0;
+    material.roughness = 0.6;
+    material.flatShading = false;
+
+    if ('color' in material) {
+      material.color = new THREE.Color(CASE_COLOR);
+    }
+
     material.needsUpdate = true;
   }
 

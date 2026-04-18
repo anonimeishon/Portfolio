@@ -35,9 +35,19 @@ body {
     clip-path: circle(0% at center);
   }
 }
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
 .pkfnt {
   font-family: 'Pokemon', sans-serif;
 }
+
 .start-screen {
   position: absolute;
   top: 0;
@@ -63,7 +73,10 @@ body {
   gap: 2rem;
 }
 .loading-text-container {
-  width: 140px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .loading-bar-container {
   display: flex;
@@ -89,6 +102,9 @@ body {
   width: 0%;
   background-color: var(--border-color);
   transition: width 0.25s ease;
+}
+.start-button-text {
+  animation: pulse 2s ease-in-out infinite;
 }
 .tileset-preview::after {
   content: 'Tileset Preview';

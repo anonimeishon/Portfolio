@@ -71,9 +71,10 @@
   <body>
     <div id="startScreen" class="start-screen">
       <div class="start-screen-content">
+        <p class="pkfnt">SEBASTIAN'S PORTFOLIO</p>
         <div id="loadingBarContainer" class="loading-bar-container">
           <div class="loading-text-container">
-            <p id="loadingText" class="pkfnt">Loading</p>
+            <p id="loadingText" class="pkfnt loading-text">Booting up</p>
           </div>
           <div class="pkbd loading-bar">
             <div class="loading-bar-track">
@@ -81,14 +82,14 @@
             </div>
           </div>
         </div>
-        <p
+        <div
           id="startBtn"
           onclick="requestPermissions()"
           class="pkbd pkbd-clickable"
           hidden
         >
-          Click to start
-        </p>
+          <p class="start-button-text">Click to start</p>
+        </div>
       </div>
     </div>
     <main class="canvas-container">

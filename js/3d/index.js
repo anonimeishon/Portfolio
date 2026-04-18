@@ -33,4 +33,6 @@ const renderScreen = ({ renderCanvas }) => {
   world.add(cameraButtonState.button);
 
   world.startLoop(renderCanvas);
+  // window.enterGameMode3D = () => world.enterGameMode();
+  // window.exitGameMode3D = () => world.exitGameMode();
 };

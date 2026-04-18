@@ -59,6 +59,11 @@ export class TileMap {
     this.rows = this.mapData.length;
     this.cols = this.mapData[0]?.length || 0;
     this.solidTileIds = this.normalizeSolidTileIds(solidTileIds);
+
+    // Pre-bake the entire static map into a single off-screen surface.
+    // On every draw() call we then do one drawImage instead of rows*cols
+    // drawImage calls + context save/scale/restore per tile.
+    this._bakedMap = this._bakeMap();
   }
 
   /**
@@ -199,36 +204,51 @@ export class TileMap {
   }
 
   /**
-   * @param {CanvasRenderingContext2D} context
-   * @param {number} cameraX - World X of the top-left corner of the viewport
-   * @param {number} cameraY - World Y of the top-left corner of the viewport
+   * Render every tile once into an off-screen canvas so draw() can use a
+   * single drawImage() instead of iterating all tiles each frame.
+   * @returns {OffscreenCanvas|HTMLCanvasElement}
    */
-  draw(context, cameraX = 0, cameraY = 0) {
-    context.save();
-    context.translate(-cameraX, -cameraY);
+  _bakeMap() {
+    const w = this.cols * this.scaledTileSize;
+    const h = this.rows * this.scaledTileSize;
+
+    const canvas =
+      typeof OffscreenCanvas !== 'undefined'
+        ? new OffscreenCanvas(w, h)
+        : Object.assign(document.createElement('canvas'), {
+            width: w,
+            height: h,
+          });
+
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
 
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
-        context.save();
-        context.scale(this.tileScaling, this.tileScaling);
-
         const tile = this.mapData[r][c];
-
-        context.drawImage(
+        ctx.drawImage(
           tile.tileSheet.image,
           tile.srcX,
           tile.srcY,
           tile.tileSheet.tileSize,
           tile.tileSheet.tileSize,
-          c * this.cellTileSize,
-          r * this.cellTileSize,
-          this.cellTileSize,
-          this.cellTileSize,
+          c * this.scaledTileSize,
+          r * this.scaledTileSize,
+          this.scaledTileSize,
+          this.scaledTileSize,
         );
-        context.restore();
       }
     }
 
-    context.restore();
+    return canvas;
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} context
+   * @param {number} cameraX - World X of the top-left corner of the viewport
+   * @param {number} cameraY - World Y of the top-left corner of the viewport
+   */
+  draw(context, cameraX = 0, cameraY = 0) {
+    context.drawImage(this._bakedMap, -cameraX, -cameraY);
   }
 }

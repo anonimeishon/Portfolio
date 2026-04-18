@@ -44,6 +44,8 @@ export class World {
   _motionBaseline = { x: 0, y: 0 };
   _hasMotionBaseline = false;
   _lastTime = 0;
+  /** When true, skip all 3D world work and only re-render the canvas texture. */
+  _gameMode = false;
   constructor() {
     scene.background = new THREE.Color(0x000000);
     scene.add(directionalLight, ambientLight, particles);
@@ -180,8 +182,33 @@ export class World {
   // Animation loop
   // -----------------------------------------------------------------------
 
+  /**
+   * Enter game mode: skip all 3D world updates (particles, motion, raycasting,
+   * camera lerp, entity frames) but keep rendering so the canvas texture that
+   * is mapped onto the GameBoy screen stays live.
+   */
+  enterGameMode() {
+    this._gameMode = true;
+  }
+
+  exitGameMode() {
+    this._gameMode = false;
+  }
+
   _animate = (timestamp) => {
     requestAnimationFrame(this._animate);
+
+    if (this._gameMode) {
+      // Only mark the canvas texture dirty and re-composite — nothing else.
+      for (const entity of this._entities) {
+        if (typeof entity.onFrame === 'function') {
+          // Only the canvas texture needsUpdate matters; skip motion/physics.
+          entity.onFrame?.(0);
+        }
+      }
+      composer.render();
+      return;
+    }
 
     const deltaSeconds = Math.min((timestamp - this._lastTime) / 1000, 0.1);
     this._lastTime = timestamp;

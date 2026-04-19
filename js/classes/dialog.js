@@ -85,11 +85,11 @@ export class Dialog {
 
     if (game.input.keys.includes('Enter')) {
       game.input.consumeKey('Enter');
-      game.sfxPlayer.play('confirm');
       if (this.charIndex < totalChars) {
         // Skip typewriter to end of current window
         this.charIndex = totalChars;
       } else {
+        game.sfxPlayer.play('confirm');
         const nextOffset = this.lineOffset + DIALOG_LINES_PER_PAGE;
         if (nextOffset < this._wrappedLines.length) {
           this.lineOffset = nextOffset;

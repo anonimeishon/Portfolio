@@ -1,4 +1,5 @@
 import { createTileReference } from '../utils/tileReference.js';
+import { Npc } from './npc.js';
 
 /**
  * @typedef {{ sheetName: string, tileIndex: number }} TileReference
@@ -17,6 +18,7 @@ import { createTileReference } from '../utils/tileReference.js';
  * @param {Portal} portal - Portal instance for map transitions.
  * @param {string} currentMapKey - Key of the current map, used for state management.
  * @param {import('./eventTrigger.js').EventTrigger[]} [eventTriggers] - Optional event triggers for this map.
+ * @param {Array<{name: string, spriteName?: string, x?: number, y?: number, direction?: string, dialog: string, movementPattern?: Array, movementPatternDelay?: number, blockedMoveDelay?: number}>} [npcConfigs]
  */
 export class TileMap {
   constructor(
@@ -29,6 +31,7 @@ export class TileMap {
     portal,
     currentMapKey,
     eventTriggers = [],
+    npcConfigs = [],
   ) {
     this.scaledTileSize = scaledTileSize;
     this.tileScaling = tileScaling;
@@ -39,6 +42,8 @@ export class TileMap {
     this.portal = portal;
     this.currentMapKey = currentMapKey;
     this.eventTriggers = eventTriggers;
+    this._npcConfigs = npcConfigs;
+    this.npcs = [];
 
     if (!this.tileSheets[this.defaultTileSheetName]) {
       throw new Error(
@@ -64,6 +69,23 @@ export class TileMap {
     // On every draw() call we then do one drawImage instead of rows*cols
     // drawImage calls + context save/scale/restore per tile.
     this._bakedMap = this._bakeMap();
+  }
+
+  attachNpcsToGame(game) {
+    this.npcs = this._npcConfigs.map((config) => new Npc(game, config));
+  }
+
+  update(deltaTime, fps) {
+    this.npcs.forEach((npc) => npc.update([], deltaTime, fps));
+  }
+
+  getInteractionTarget(player) {
+    const npc = this.npcs.find((candidate) => candidate.isFacing(player));
+    if (npc) return npc;
+
+    return (
+      this.eventTriggers.find((trigger) => trigger.isFacing(player)) ?? null
+    );
   }
 
   /**
@@ -250,5 +272,10 @@ export class TileMap {
    */
   draw(context, cameraX = 0, cameraY = 0) {
     context.drawImage(this._bakedMap, -cameraX, -cameraY);
+
+    this.npcs
+      .slice()
+      .sort((left, right) => left.y - right.y)
+      .forEach((npc) => npc.draw(context));
   }
 }

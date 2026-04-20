@@ -70,6 +70,23 @@ export class MainRoomMap extends TileMap {
           dialog: '"Trophy Room"',
         }),
       ],
+      [
+        {
+          name: 'mainRoomGuide',
+          spriteName: 'mainCharacter',
+          x: TRAINER_SPRITE_SIZE * 5,
+          y: TRAINER_SPRITE_SIZE * 2,
+          direction: 'left',
+          dialog: `Hey!\n I'm Sebastian\nThis is my room. You're free to walk around and explore. \n\nIf you're not sure of what to do... Check out the Trophy Room up there!`,
+          movementPattern: [
+            { direction: 'left', pauseMs: 3000 },
+            { direction: 'down', pauseMs: 3000 },
+            { direction: 'right', pauseMs: 3000 },
+            { direction: 'up', pauseMs: 3000 },
+          ],
+          movementPatternDelay: 700,
+        },
+      ],
     );
   }
 }

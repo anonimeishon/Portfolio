@@ -37,10 +37,11 @@ export class Game {
     this.player = new Player(
       this,
       true,
-      this.state.player.x || null,
-      this.state.player.y || null,
+      this.state.player.x ?? null,
+      this.state.player.y ?? null,
       this.state.player.direction,
     );
+    this.map.attachNpcsToGame(this);
 
     this.globalEventTriggers.showCredits = new EventTrigger({
       name: 'credits',
@@ -119,6 +120,7 @@ export class Game {
       this.menu.update(this);
       return; // block player movement while menu is open
     }
+    this.map.update(deltaTime, fps);
     this.player.update(this.input.keys, deltaTime, fps);
     this._checkInteraction();
   }
@@ -126,6 +128,7 @@ export class Game {
   loadMap(mapKey) {
     if (!maps[mapKey]) throw new Error(`Unknown map: "${mapKey}"`);
     this.map = new maps[mapKey]();
+    this.map.attachNpcsToGame(this);
     this.state.update({ player: this.player, mapKey });
   }
 
@@ -133,11 +136,15 @@ export class Game {
     if (this.player.isMoving) return;
     if (!this.input.keys.includes('Enter')) return;
     this.input.consumeKey('Enter');
-    const hit = this.map.eventTriggers.find((t) => t.isFacing(this.player));
+    const hit = this.map.getInteractionTarget(this.player);
     if (!hit) return;
     this.player.enableMovement = false;
     hit.dialog.reset();
     this.state.activeEvent = hit;
+    // Make NPCs face the player when dialog starts
+    if (hit._faceToward) {
+      hit._faceToward(this.player.x, this.player.y);
+    }
   }
 
   /**

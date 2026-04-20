@@ -89,6 +89,29 @@ export class TileMap {
   }
 
   /**
+   * Returns an event trigger located at the given world-space tile coordinate.
+   * @param {number} x
+   * @param {number} y
+   * @returns {import('./eventTrigger.js').EventTrigger | null}
+   */
+  getEventTriggerAt(x, y) {
+    return (
+      this.eventTriggers.find((trigger) => trigger.hasPosition(x, y)) ?? null
+    );
+  }
+
+  /**
+   * Returns an NPC occupying the given world-space tile coordinate.
+   * Moving NPCs reserve their target tile while in transit.
+   * @param {number} x
+   * @param {number} y
+   * @returns {Npc | null}
+   */
+  getNpcAt(x, y) {
+    return this.npcs.find((npc) => npc._occupiesTile(x, y)) ?? null;
+  }
+
+  /**
    * Legacy helper kept for compatibility with the old string format.
    * @param {string} sheetName
    * @param {number} tileIndex

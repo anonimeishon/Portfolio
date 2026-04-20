@@ -69,6 +69,10 @@ export class Game {
             : this.sfxPlayer.mute(),
       },
       {
+        label: 'FLSCRN',
+        action: () => window.toggleFullscreen?.(),
+      },
+      {
         label: 'GITHUB',
         action: () => window.open(LINK_GITHUB, '_blank', 'noopener,noreferrer'),
       },
@@ -98,6 +102,58 @@ export class Game {
     return Math.round(this.player.y - this.height / 2 + this.player.height / 2);
   }
 
+  _toWorldPosition(canvasX, canvasY) {
+    return {
+      worldX: this.cameraX + canvasX,
+      worldY: this.cameraY + canvasY,
+    };
+  }
+
+  _snapToGrid(worldX, worldY) {
+    const step = this.player.width;
+    return {
+      tileX: Math.floor(worldX / step) * step,
+      tileY: Math.floor(worldY / step) * step,
+    };
+  }
+
+  _activateEvent(eventTrigger) {
+    this.player.enableMovement = false;
+    eventTrigger.dialog.reset();
+    this.state.activeEvent = eventTrigger;
+  }
+
+  handleScreenClick(canvasX, canvasY) {
+    if (this.state.transition || this.menu.isOpen) return false;
+
+    if (this.state.activeEvent) {
+      this.state.activeEvent.dialog.advance(this);
+      return true;
+    }
+
+    const { worldX, worldY } = this._toWorldPosition(canvasX, canvasY);
+    const { tileX, tileY } = this._snapToGrid(worldX, worldY);
+
+    const npc = this.map.getNpcAt(tileX, tileY);
+    if (npc) {
+      this._activateEvent(npc);
+      npc._faceToward(this.player.x, this.player.y);
+      return true;
+    }
+
+    const trigger = this.map.getEventTriggerAt(tileX, tileY);
+    if (trigger) {
+      this._activateEvent(trigger);
+      return true;
+    }
+
+    if (this.map.portal.activateAt(tileX, tileY, this)) {
+      return true;
+    }
+
+    return false;
+  }
+
   update(deltaTime, fps) {
     if (this.state.transition) {
       this.map.portal.updateTransition(this);
@@ -120,6 +176,13 @@ export class Game {
       this.menu.update(this);
       return; // block player movement while menu is open
     }
+
+    const hasMovementInput =
+      this.input.keys.includes('ArrowUp') ||
+      this.input.keys.includes('ArrowDown') ||
+      this.input.keys.includes('ArrowLeft') ||
+      this.input.keys.includes('ArrowRight');
+
     this.map.update(deltaTime, fps);
     this.player.update(this.input.keys, deltaTime, fps);
     this._checkInteraction();
@@ -138,9 +201,7 @@ export class Game {
     this.input.consumeKey('Enter');
     const hit = this.map.getInteractionTarget(this.player);
     if (!hit) return;
-    this.player.enableMovement = false;
-    hit.dialog.reset();
-    this.state.activeEvent = hit;
+    this._activateEvent(hit);
     // Make NPCs face the player when dialog starts
     if (hit._faceToward) {
       hit._faceToward(this.player.x, this.player.y);

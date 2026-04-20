@@ -67,6 +67,7 @@ export const setupMenuButton = () => {
   };
 
   fullscreenButton.addEventListener('click', toggleFullscreen);
+  window.toggleFullscreen = toggleFullscreen; // Expose for game menu
   document.addEventListener('fullscreenchange', syncFullscreenState);
   document.addEventListener('webkitfullscreenchange', syncFullscreenState);
   syncFullscreenState();

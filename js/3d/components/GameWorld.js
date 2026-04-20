@@ -140,7 +140,15 @@ export class World {
 
     const entity = this._meshToEntity.get(intersection.object);
     if (!entity) return;
-    entity?.hit?.(event);
+    entity?.hit?.(event, intersection);
+
+    const handledByEntity =
+      entity.onPointerDown?.(event, intersection) ?? false;
+    if (handledByEntity) {
+      event.preventDefault();
+      return;
+    }
+
     const key = entity.resolveKey(intersection);
     if (!key) return;
 

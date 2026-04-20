@@ -41,6 +41,36 @@ export class Portal {
   }
 
   /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {PortalEntry | null}
+   */
+  getPortalAt(x, y) {
+    return this.portals[`${x},${y}`] ?? null;
+  }
+
+  /**
+   * Activates a portal directly by world position.
+   * @param {number} x
+   * @param {number} y
+   * @param {Game} game
+   * @returns {boolean}
+   */
+  activateAt(x, y, game) {
+    const portal = this.getPortalAt(x, y);
+    if (!portal) return false;
+
+    this._startTransition(
+      portal.targetMap,
+      portal.targetX,
+      portal.targetY,
+      game.player,
+      game,
+    );
+    return true;
+  }
+
+  /**
    * @param {string} mapKey
    * @param {number} targetX
    * @param {number} targetY

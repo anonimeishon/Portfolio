@@ -85,20 +85,35 @@ export class Dialog {
 
     if (game.input.keys.includes('Enter')) {
       game.input.consumeKey('Enter');
-      if (this.charIndex < totalChars) {
-        // Skip typewriter to end of current window
-        this.charIndex = totalChars;
-      } else {
-        game.sfxPlayer.play('confirm');
-        const nextOffset = this.lineOffset + DIALOG_LINES_PER_PAGE;
-        if (nextOffset < this._wrappedLines.length) {
-          this.lineOffset = nextOffset;
-          this.charIndex = 0;
-        } else {
-          this.close(game);
-        }
-      }
+      this.advance(game, totalChars);
     }
+  }
+
+  /**
+   * Advance current dialog state as if Enter was pressed.
+   * @param {import('./game.js').Game} game
+   * @param {number} [totalChars]
+   */
+  advance(game, totalChars = null) {
+    const visibleLines = this._visibleLines();
+    const resolvedTotalChars =
+      totalChars ?? visibleLines.reduce((sum, line) => sum + line.length, 0);
+
+    if (this.charIndex < resolvedTotalChars) {
+      // Skip typewriter to end of current page
+      this.charIndex = resolvedTotalChars;
+      return;
+    }
+
+    game.sfxPlayer.play('confirm');
+    const nextOffset = this.lineOffset + DIALOG_LINES_PER_PAGE;
+    if (nextOffset < this._wrappedLines.length) {
+      this.lineOffset = nextOffset;
+      this.charIndex = 0;
+      return;
+    }
+
+    this.close(game);
   }
 
   /** @param {import('./game.js').Game} game */

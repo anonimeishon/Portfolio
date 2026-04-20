@@ -50,6 +50,9 @@ export class GameBoy {
   /** @type {THREE.Mesh | null} Start button */
   startButton = null;
 
+  /** @type {THREE.Mesh | null} Screen plane carrying the 2D canvas texture */
+  screenPlane = null;
+
   _dotMatrixMaterial = dotMatrixMaterialBuilder(canvasTexture);
 
   /** Target rotation angles the dpad lerps toward each frame. */
@@ -71,8 +74,10 @@ export class GameBoy {
   /** Target Y positions the action buttons lerp toward each frame. */
   _aButtonTargetY = 0;
   _bButtonTargetY = 0;
-  constructor(world) {
+
+  constructor(world, game) {
     this._world = world;
+    this._game = game;
     /**
      * @type {import('three/examples/jsm/loaders/GLTFLoader').GLTF}
      */
@@ -147,6 +152,28 @@ export class GameBoy {
       this._touchingB = false;
       this._bButtonTargetY = this._bButtonRestY;
     }
+  }
+
+  _uvToCanvas(uv) {
+    const u = THREE.MathUtils.clamp(uv.x, 0, 1);
+    const v = THREE.MathUtils.clamp(uv.y, 0, 1);
+    return {
+      x: Math.floor(u * (this._game.width - 1)),
+      y: Math.floor((1 - v) * (this._game.height - 1)),
+    };
+  }
+
+  onPointerDown(event, intersection) {
+    if (!this.screenPlane || intersection.object !== this.screenPlane) {
+      return false;
+    }
+
+    if (intersection.uv) {
+      const click = this._uvToCanvas(intersection.uv);
+      this._game.handleScreenClick(click.x, click.y);
+    }
+
+    return true;
   }
 
   // -----------------------------------------------------------------------
@@ -251,6 +278,8 @@ export class GameBoy {
 
     geo.rotateX(Math.PI * 0.5);
     screenParent.add(plane);
+    this.screenPlane = plane;
+    this._world.registerMesh(plane, this);
   }
 
   /**

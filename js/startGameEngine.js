@@ -14,4 +14,5 @@ export const startGameEngine = (canvas) => {
 
   const game = new Game(canvas.width, canvas.height, canvas, new MainRoomMap());
   game.animate(ctx, 0);
+  return game;
 };

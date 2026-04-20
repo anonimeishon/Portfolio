@@ -31,6 +31,6 @@ export const startGames = async (
     threeDGamePromise,
   ]);
 
-  startGameEngine(mainCanvas);
-  start3DGame({ renderCanvas });
+  const game = startGameEngine(mainCanvas);
+  start3DGame({ renderCanvas, game });
 };

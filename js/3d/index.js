@@ -10,18 +10,18 @@ import { createInstructionsArrow } from './components/text/instructionsArrow.js'
 import { createInstructionsControls } from './components/text/instructionsControls.js';
 import { createModelCredits } from './components/text/gameboyCredits.js';
 
-export const start3DGame = ({ renderCanvas }) => {
+export const start3DGame = ({ renderCanvas, game }) => {
   window.switchCameraMode = () => {
     if (cameraButtonState.cameraMode === 'game') switchToReset();
     else switchToGame();
   };
-  renderScreen({ renderCanvas });
+  renderScreen({ renderCanvas, game });
 };
 
-const renderScreen = ({ renderCanvas }) => {
+const renderScreen = ({ renderCanvas, game }) => {
   const world = new World();
 
-  world.add(new GameBoy(world));
+  world.add(new GameBoy(world, game));
   // world.add(createInstructionsText());
   world.add(createInstructionsArrow());
   world.add(createInstructionsControls());

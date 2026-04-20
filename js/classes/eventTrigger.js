@@ -25,4 +25,13 @@ export class EventTrigger {
   isFacing(player) {
     return !!this._triggers[`${player.facingX},${player.facingY}`];
   }
+
+  /**
+   * Returns true if this trigger occupies the given world position.
+   * @param {number} x
+   * @param {number} y
+   */
+  hasPosition(x, y) {
+    return !!this._triggers[`${x},${y}`];
+  }
 }

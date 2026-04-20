@@ -274,6 +274,7 @@ body {
 }
 /* === Button Bar Buttons === */
 .camera-switch-button,
+.fullscreen-toggle-button,
 .menu-toggle-button {
   height: 2rem;
   width: 2rem;
@@ -289,12 +290,18 @@ body {
 .menu-toggle-button {
   padding-bottom: 0.5rem;
 }
+.fullscreen-toggle-button {
+  font-size: 0.65rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
 .camera-switch-icon {
   display: block;
   width: 1em;
   height: 1em;
   object-fit: contain;
 }
+.fullscreen-toggle-button.is-active,
 .menu-toggle-button.is-active {
   background-color: var(--border-color);
   color: var(--border-background-color);

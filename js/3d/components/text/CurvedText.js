@@ -10,6 +10,7 @@ let _pendingArc = null;
 const FONT_SIZE = 64; // px — canvas resolution
 const STROKE_WIDTH = 10; // px
 const STROKE_PAD = 6; // px per side, prevents stroke clipping
+const DESCENDER_PAD = 4; // extra bottom room for Safari glyph clipping
 
 /**
  * @typedef {{
@@ -87,8 +88,16 @@ export class CurvedText extends Text {
     tmpCtx.font = `${FONT_SIZE}px Pokemon`;
 
     const chars = line.split('');
-    const charWidths = chars.map((c) => tmpCtx.measureText(c).width);
-    const totalWidth = charWidths.reduce((s, w) => s + w, 0);
+    const fallbackAscent = FONT_SIZE * 0.8;
+    const fallbackDescent = FONT_SIZE * 0.25;
+    const charMetrics = chars.map((char) => {
+      const metrics = tmpCtx.measureText(char);
+      const width = metrics.width;
+      const ascent = metrics.actualBoundingBoxAscent || fallbackAscent;
+      const descent = metrics.actualBoundingBoxDescent || fallbackDescent;
+      return { width, ascent, descent };
+    });
+    const totalWidth = charMetrics.reduce((s, metric) => s + metric.width, 0);
 
     const pixelsToWorld = this.size / FONT_SIZE;
     const totalAngle = (totalWidth * pixelsToWorld) / radius;
@@ -97,27 +106,29 @@ export class CurvedText extends Text {
     const group = new THREE.Group();
 
     chars.forEach((char, i) => {
-      const charWorldW = charWidths[i] * pixelsToWorld;
+      const { width, ascent, descent } = charMetrics[i];
+      const charWorldW = width * pixelsToWorld;
       const charAngle = charWorldW / radius;
       const placementAngle = a + charAngle / 2;
 
       // ── Per-character canvas ──────────────────────────────────────────────
       const dpr = Math.min(window.devicePixelRatio || 1, 3);
-      const cw = Math.max(1, Math.ceil(charWidths[i]) + STROKE_PAD * 2);
-      const ch = FONT_SIZE + STROKE_PAD * 2;
+      const cw = Math.max(1, Math.ceil(width) + STROKE_PAD * 2);
+      const ch = Math.ceil(ascent + descent) + STROKE_PAD * 2 + DESCENDER_PAD;
+      const baselineY = STROKE_PAD + ascent;
       const canvas = document.createElement('canvas');
       canvas.width = cw * dpr;
       canvas.height = ch * dpr;
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
       ctx.font = `${FONT_SIZE}px Pokemon`;
-      ctx.textBaseline = 'top';
+      ctx.textBaseline = 'alphabetic';
       ctx.lineJoin = 'round';
       ctx.lineWidth = STROKE_WIDTH;
       ctx.strokeStyle = 'black';
       ctx.fillStyle = fillColor;
-      ctx.strokeText(char, STROKE_PAD, STROKE_PAD);
-      ctx.fillText(char, STROKE_PAD, STROKE_PAD);
+      ctx.strokeText(char, STROKE_PAD, baselineY);
+      ctx.fillText(char, STROKE_PAD, baselineY);
 
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;

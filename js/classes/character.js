@@ -110,19 +110,21 @@ export class Character {
     this.facingY = this.y + dy;
   }
 
+  _occupiesTile(targetX, targetY) {
+    const occupiedX = this.isMoving ? this.targetX : this.x;
+    const occupiedY = this.isMoving ? this.targetY : this.y;
+
+    return occupiedX === targetX && occupiedY === targetY;
+  }
+
   _isCharacterCollisionAt(targetX, targetY) {
     const player = this.game.player;
-    if (
-      player &&
-      player !== this &&
-      player.x === targetX &&
-      player.y === targetY
-    ) {
+    if (player && player !== this && player._occupiesTile(targetX, targetY)) {
       return true;
     }
 
     return this.game.map.npcs.some(
-      (npc) => npc !== this && npc.x === targetX && npc.y === targetY,
+      (npc) => npc !== this && npc._occupiesTile(targetX, targetY),
     );
   }
 

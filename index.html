@@ -31,6 +31,42 @@
     <meta property="og:type" content="website" />
 
     <title>Sebastian's Portfolio</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: white;
+      }
+
+      .start-screen {
+        position: fixed;
+        inset: 0;
+        background: white;
+        z-index: 999;
+        overflow: hidden;
+      }
+
+      .start-screen-iris {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300vmax;
+        height: 300vmax;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: white;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      .game-container {
+        display: none;
+        visibility: hidden;
+      }
+    </style>
     <link rel="icon" href="assets/favicon.png" />
     <link rel="stylesheet" href="css/retroBorder.css" />
     <link rel="stylesheet" href="css/main.css" />

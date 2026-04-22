@@ -33,8 +33,9 @@ export class Toast {
   }
 
   _handleDismiss() {
-    this._onDismiss?.();
+    const onDismiss = this._onDismiss;
     this.hide();
+    onDismiss?.();
   }
 
   /**
@@ -44,7 +45,9 @@ export class Toast {
     this._textEl.textContent = text;
     this._onDismiss = onDismiss;
     this._element.classList.remove('toast--top', 'toast--bottom');
-    this._element.classList.add(position === 'top' ? 'toast--top' : 'toast--bottom');
+    this._element.classList.add(
+      position === 'top' ? 'toast--top' : 'toast--bottom',
+    );
     this._element.classList.remove('toast--hidden');
   }
 

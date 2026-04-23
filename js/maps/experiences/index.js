@@ -46,7 +46,7 @@ export class ExperiencesRoomMap extends TileMap {
         {
           targetMap: 'mainRoom',
           targetX: TRAINER_SPRITE_SIZE * 3,
-          targetY: TRAINER_SPRITE_SIZE * 0,
+          targetY: TRAINER_SPRITE_SIZE * 1,
           x: TRAINER_SPRITE_SIZE * 1,
           y: TRAINER_SPRITE_SIZE * 7,
         },

@@ -5,6 +5,7 @@
   font-style: normal;
 }
 :root {
+  /* Max z-index 500 */
   /* sits on top of the modal backdrop */
   --modal-z-index: 15;
   --modal-backdrop-z-index: 300;
@@ -400,12 +401,16 @@ body {
   justify-content: center;
   z-index: var(--modal-backdrop-z-index);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    visibility 0s linear 0.2s;
   touch-action: auto;
 }
 .portfolio-modal-backdrop.is-open {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 .portfolio-modal {

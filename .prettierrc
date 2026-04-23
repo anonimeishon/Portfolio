@@ -1,0 +1,17 @@
+{
+  "printWidth": 100,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "arrowParens": "always",
+
+  "overrides": [
+    {
+      "files": ["**/maps/**/constants.js"],
+      "options": {
+        "printWidth": 1000
+      }
+    }
+  ]
+}

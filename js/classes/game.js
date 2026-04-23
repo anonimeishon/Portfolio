@@ -8,11 +8,7 @@ import { State } from './state.js';
 import { Menu } from './menu.js';
 import { EventTrigger } from './eventTrigger.js';
 import { sfxPlayer } from './sounds/sfxPlayer.js';
-import {
-  LINK_GITHUB,
-  LINK_LINKEDIN,
-  LINK_CONTACT,
-} from '../constants/links.js';
+import { LINK_GITHUB, LINK_LINKEDIN, LINK_CONTACT } from '../constants/links.js';
 
 export class Game {
   /**
@@ -58,15 +54,11 @@ export class Game {
       { label: 'CAMERA', action: () => window.switchCameraMode?.() },
       {
         label: 'CREDIT',
-        action: () =>
-          (this.state.activeEvent = this.globalEventTriggers.showCredits),
+        action: () => (this.state.activeEvent = this.globalEventTriggers.showCredits),
       },
       {
         label: 'MUTE',
-        action: () =>
-          this.sfxPlayer.isMuted
-            ? this.sfxPlayer.unmute()
-            : this.sfxPlayer.mute(),
+        action: () => (this.sfxPlayer.isMuted ? this.sfxPlayer.unmute() : this.sfxPlayer.mute()),
       },
       {
         label: 'FLSCRN',
@@ -78,13 +70,11 @@ export class Game {
       },
       {
         label: 'LNKDIN',
-        action: () =>
-          window.open(LINK_LINKEDIN, '_blank', 'noopener,noreferrer'),
+        action: () => window.open(LINK_LINKEDIN, '_blank', 'noopener,noreferrer'),
       },
       {
         label: 'CONTCT',
-        action: () =>
-          window.open(LINK_CONTACT, '_blank', 'noopener,noreferrer'),
+        action: () => window.open(LINK_CONTACT, '_blank', 'noopener,noreferrer'),
       },
     ]);
     this.fps = 30;
@@ -120,6 +110,7 @@ export class Game {
   _activateEvent(eventTrigger) {
     this.player.enableMovement = false;
     eventTrigger.dialog.reset();
+    eventTrigger.selectionPrompt?.reset();
     this.state.activeEvent = eventTrigger;
   }
 
@@ -127,7 +118,10 @@ export class Game {
     if (this.state.transition || this.menu.isOpen) return false;
 
     if (this.state.activeEvent) {
-      this.state.activeEvent.dialog.advance(this);
+      // Don't advance dialog while the selection prompt is waiting for input
+      if (!this.state.activeEvent.selectionPrompt?.isOpen) {
+        this.state.activeEvent.dialog.advance(this);
+      }
       return true;
     }
 
@@ -160,8 +154,12 @@ export class Game {
       return; // block player input during transition
     }
     if (this.state.activeEvent) {
-      this.state.activeEvent.dialog.update(this);
-      return; // block movement during dialog
+      if (this.state.activeEvent.selectionPrompt?.isOpen) {
+        this.state.activeEvent.selectionPrompt.update(this);
+      } else {
+        this.state.activeEvent.dialog.update(this);
+      }
+      return; // block movement during dialog / prompt
     }
     // Toggle menu on p or Start
     if (this.input.keys.includes('p') || this.input.keys.includes('Start')) {
@@ -219,8 +217,10 @@ export class Game {
     if (this.state.transition)
       this.map.portal.drawTransition(context, this.width, this.height, this);
     this.menu.draw(context, this);
-    if (this.state.activeEvent)
+    if (this.state.activeEvent) {
       this.state.activeEvent.dialog.draw(context, this);
+      this.state.activeEvent.selectionPrompt?.draw(context, this);
+    }
   }
   animate(context, timeStamp = 0) {
     const deltaTime = timeStamp - this.lastTime;

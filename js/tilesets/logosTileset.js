@@ -10,15 +10,13 @@ export const logosTileBuilder = createTileBuilder(LOGOS_TILESET_NAME);
 
 export const LOGOS_TILESET_SOLID_TILE_IDS = new Set([
   //-2 would be a black tile
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-  22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+  27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+  51, 52, 53,
 ]);
 
 export const loadLogosTileset = async () => {
-  await sharedLoader.loadImage(
-    LOGOS_TILESET_NAME,
-    `${ASSETS_BASE}tilesets/logosTileset.png`,
-  );
+  await sharedLoader.loadImage(LOGOS_TILESET_NAME, `${ASSETS_BASE}tilesets/logosTileset.png`);
 
   const image = sharedLoader.get(LOGOS_TILESET_NAME);
 

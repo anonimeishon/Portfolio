@@ -15,18 +15,9 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <meta
-      property="og:title"
-      content="Sebastian Mainero | Full Stack Developer"
-    />
-    <meta
-      property="og:description"
-      content="Interactive 3D portfolio built with Three.js."
-    />
-    <meta
-      property="og:image"
-      content="https://sebastianmainero.com/public/og-image.png"
-    />
+    <meta property="og:title" content="Sebastian Mainero | Full Stack Developer" />
+    <meta property="og:description" content="Interactive 3D portfolio built with Three.js." />
+    <meta property="og:image" content="https://sebastianmainero.com/public/og-image.png" />
     <meta property="og:url" content="https://sebastianmainero.com" />
     <meta property="og:type" content="website" />
 
@@ -48,7 +39,7 @@
         position: fixed;
         inset: 0;
         background: white;
-        z-index: 400;
+        z-index: 500;
         overflow: hidden;
       }
 
@@ -135,9 +126,7 @@
       </div>
     </div>
     <main class="canvas-container">
-      <h1 class="hidden display-none">
-        Sebastian Mainero – Full Stack Developer
-      </h1>
+      <h1 class="hidden display-none">Sebastian Mainero – Full Stack Developer</h1>
       <canvas class="main-canvas" id="renderCanvas" tabindex="0"></canvas>
       <!-- <canvas id="debug-canvas" width="437" height="1240"></canvas> -->
       <div class="button-bar">
@@ -148,11 +137,7 @@
           aria-label="Switch camera"
           onclick="switchCameraMode()"
         >
-          <img
-            src="assets/icons/camera.svg"
-            alt=""
-            class="camera-switch-icon"
-          />
+          <img src="assets/icons/camera.svg" alt="" class="camera-switch-icon" />
         </button>
         <button
           id="fullscreenToggleButton"
@@ -173,28 +158,12 @@
       </div>
     </main>
     <div class="canvas-container game-container">
-      <canvas
-        class="game-canvas"
-        id="mainCanvas"
-        width="480"
-        height="432"
-        tabindex="0"
-      ></canvas>
+      <canvas class="game-canvas" id="mainCanvas" width="480" height="432" tabindex="0"></canvas>
     </div>
 
-    <div
-      id="toast"
-      class="toast pkbd toast--hidden"
-      role="status"
-      aria-live="polite"
-    >
+    <div id="toast" class="toast pkbd toast--hidden" role="status" aria-live="polite">
       <p id="toastText" class="toast__text"></p>
-      <button
-        id="toastClose"
-        class="toast__close"
-        type="button"
-        aria-label="Dismiss tutorial hint"
-      >
+      <button id="toastClose" class="toast__close" type="button" aria-label="Dismiss tutorial hint">
         ✕
       </button>
     </div>
@@ -214,9 +183,7 @@
     >
       <div class="portfolio-modal pkbd">
         <header class="portfolio-modal-header">
-          <h2 id="portfolioModalTitle" class="portfolio-modal-title">
-            SEBASTIAN’S PORTFOLIO
-          </h2>
+          <h2 id="portfolioModalTitle" class="portfolio-modal-title">SEBASTIAN’S PORTFOLIO</h2>
           <button
             id="portfolioModalClose"
             class="portfolio-modal-close pkbd pkbd-clickable"
@@ -227,17 +194,13 @@
         </header>
         <section class="portfolio-modal-bio">
           <h3 class="hidden display-none">About Sebastian Mainero</h3>
+          <p>My name is <b>SEBASTIAN MAINERO</b> and I'm a <b>FULL STACK DEVELOPER</b>.</p>
           <p>
-            My name is <b>SEBASTIAN MAINERO</b> and I'm a
-            <b>FULL STACK DEVELOPER</b>.
+            This is my interactive portfolio, feel free to explore, click around, and see what I've
+            built.
           </p>
           <p>
-            This is my interactive portfolio, feel free to explore, click
-            around, and see what I've built.
-          </p>
-          <p>
-            Use the buttons on the gameboy or your keyboard to navigate and
-            interact with the game.
+            Use the buttons on the gameboy or your keyboard to navigate and interact with the game.
           </p>
         </section>
         <div class="portfolio-modal-links">
@@ -247,11 +210,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img
-              src="assets/icons/github.png"
-              alt=""
-              class="portfolio-link-icon"
-            />
+            <img src="assets/icons/github.png" alt="" class="portfolio-link-icon" />
             <span>GitHub</span>
           </a>
 
@@ -261,11 +220,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img
-              src="assets/icons/contact.jpg"
-              alt=""
-              class="portfolio-link-icon"
-            />
+            <img src="assets/icons/contact.jpg" alt="" class="portfolio-link-icon" />
             <span>Contact</span>
           </a>
           <a
@@ -274,11 +229,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img
-              src="assets/icons/linkedin.png"
-              alt=""
-              class="portfolio-link-icon"
-            />
+            <img src="assets/icons/linkedin.png" alt="" class="portfolio-link-icon" />
             <span>LinkedIn</span>
           </a>
         </div>

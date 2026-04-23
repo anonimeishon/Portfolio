@@ -5,10 +5,7 @@ import { Portal } from '../../classes/portal.js';
 import { TileMap } from '../../classes/tileMap.js';
 import { EventTrigger } from '../../classes/eventTrigger.js';
 import { TRAINER_SPRITE_SIZE } from '../../constants/player.js';
-import {
-  SCALED_TILE_SIZE,
-  TILE_SCALING_AMOUNT,
-} from '../../constants/tileset.js';
+import { SCALED_TILE_SIZE, TILE_SCALING_AMOUNT } from '../../constants/tileset.js';
 import { MAP_MAIN_ROOM } from './constants.js';
 import {
   MAIN_TILESET_NAME,
@@ -44,8 +41,8 @@ export class MainRoomMap extends TileMap {
         // },
         {
           targetMap: 'experiences',
-          targetX: TRAINER_SPRITE_SIZE * 1,
-          targetY: TRAINER_SPRITE_SIZE * 6,
+          targetX: TRAINER_SPRITE_SIZE * 2,
+          targetY: TRAINER_SPRITE_SIZE * 10,
           x: TRAINER_SPRITE_SIZE * 3,
 
           y: TRAINER_SPRITE_SIZE * 0,
@@ -55,17 +52,13 @@ export class MainRoomMap extends TileMap {
       [
         new EventTrigger({
           name: 'computer',
-          positions: [
-            { x: TRAINER_SPRITE_SIZE * 0, y: TRAINER_SPRITE_SIZE * 1 },
-          ],
+          positions: [{ x: TRAINER_SPRITE_SIZE * 0, y: TRAINER_SPRITE_SIZE * 1 }],
           action: 'dialog',
           dialog: `It's a MapBoox N3 Ultra...\n Looks decent.`,
         }),
         new EventTrigger({
           name: 'experiencesRoomSign',
-          positions: [
-            { x: TRAINER_SPRITE_SIZE * 2, y: TRAINER_SPRITE_SIZE * 0 },
-          ],
+          positions: [{ x: TRAINER_SPRITE_SIZE * 2, y: TRAINER_SPRITE_SIZE * 0 }],
           action: 'dialog',
           dialog: '"Trophy Room"',
         }),
@@ -89,9 +82,7 @@ export class MainRoomMap extends TileMap {
         }),
         new EventTrigger({
           name: 'experiencesRoomSign',
-          positions: [
-            { x: TRAINER_SPRITE_SIZE * 6, y: TRAINER_SPRITE_SIZE * 0 },
-          ],
+          positions: [{ x: TRAINER_SPRITE_SIZE * 6, y: TRAINER_SPRITE_SIZE * 0 }],
           action: 'dialog',
           dialog: `It's bright outside.`,
         }),

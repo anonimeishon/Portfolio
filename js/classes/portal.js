@@ -30,13 +30,7 @@ export class Portal {
     const portal = this.portals[`${player.x},${player.y}`];
 
     if (portal) {
-      this._startTransition(
-        portal.targetMap,
-        portal.targetX,
-        portal.targetY,
-        player,
-        game,
-      );
+      this._startTransition(portal.targetMap, portal.targetX, portal.targetY, player, game);
     }
   }
 
@@ -60,14 +54,19 @@ export class Portal {
     const portal = this.getPortalAt(x, y);
     if (!portal) return false;
 
-    this._startTransition(
-      portal.targetMap,
-      portal.targetX,
-      portal.targetY,
-      game.player,
-      game,
-    );
+    this._startTransition(portal.targetMap, portal.targetX, portal.targetY, game.player, game);
     return true;
+  }
+
+  /**
+   * Public helper — starts a map transition programmatically (e.g. from a yes/no action).
+   * @param {string} mapKey
+   * @param {number} targetX
+   * @param {number} targetY
+   * @param {Game} game
+   */
+  startTransitionTo(mapKey, targetX, targetY, game) {
+    this._startTransition(mapKey, targetX, targetY, game.player, game);
   }
 
   /**

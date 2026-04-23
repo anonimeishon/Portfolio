@@ -1,3 +1,5 @@
 {
-  "js/ts.preferences.importModuleSpecifierEnding": "js"
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
+  "prettier.configPath": ".prettierrc",
+  "prettier.requireConfig": false
 }

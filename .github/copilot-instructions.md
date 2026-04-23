@@ -14,3 +14,6 @@ For any updates, animations or movement logic, ensure that the code is optimized
 Also always strive for using Deltatime instead of Date.now() for consistency across different devices and frame rates.
 
 When Creating animations, always strive for smooth transitions and best performance.
+
+#Canvas Main Game functionality
+##Portal Class moves the player between maps, it should have a destination map and coordinates for where the player should be placed on the destination map, and origin coordinates.

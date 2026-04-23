@@ -14,14 +14,10 @@ import { ASSETS_BASE } from '../constants/assets.js';
 import { sharedLoader } from '../utils/assetLoader.js';
 
 const MAX_CHARS_PER_LINE = Math.floor(
-  (CANVAS_WIDTH - DIALOG_MARGIN * 2 - DIALOG_PADDING * 2) /
-    DIALOG_CHARACTER_WIDTH,
+  (CANVAS_WIDTH - DIALOG_MARGIN * 2 - DIALOG_PADDING * 2) / DIALOG_CHARACTER_WIDTH,
 );
 
-await sharedLoader.loadImage(
-  'dialogBorder',
-  `${ASSETS_BASE}borders/BorderTileSet.png`,
-);
+await sharedLoader.loadImage('dialogBorder', `${ASSETS_BASE}borders/BorderTileSet.png`);
 
 export class Dialog {
   /**
@@ -65,10 +61,7 @@ export class Dialog {
   }
 
   _visibleLines() {
-    return this._wrappedLines.slice(
-      this.lineOffset,
-      this.lineOffset + DIALOG_LINES_PER_PAGE,
-    );
+    return this._wrappedLines.slice(this.lineOffset, this.lineOffset + DIALOG_LINES_PER_PAGE);
   }
 
   /** @param {import('./game.js').Game} game */
@@ -77,10 +70,7 @@ export class Dialog {
     const totalChars = visibleLines.reduce((sum, l) => sum + l.length, 0);
 
     if (this.charIndex < totalChars) {
-      this.charIndex = Math.min(
-        this.charIndex + DIALOG_CHARS_PER_FRAME,
-        totalChars,
-      );
+      this.charIndex = Math.min(this.charIndex + DIALOG_CHARS_PER_FRAME, totalChars);
     }
 
     if (game.input.keys.includes('Enter')) {
@@ -119,6 +109,13 @@ export class Dialog {
   /** @param {import('./game.js').Game} game */
   close(game) {
     const event = game.state.activeEvent;
+
+    // For selection events, intercept the first close and show the selection prompt instead.
+    if (event?.selectionPrompt && !event.selectionPrompt._answered) {
+      event.selectionPrompt.open();
+      return;
+    }
+
     game.state.saveStateBackup({
       interactions: {
         [game.map.currentMapKey]: {
@@ -145,8 +142,7 @@ export class Dialog {
     const visibleLines = this._visibleLines();
     const totalChars = visibleLines.reduce((sum, l) => sum + l.length, 0);
 
-    const BOX_H =
-      DIALOG_PADDING * 2 + DIALOG_LINES_PER_PAGE * DIALOG_LINE_HEIGHT;
+    const BOX_H = DIALOG_PADDING * 2 + DIALOG_LINES_PER_PAGE * DIALOG_LINE_HEIGHT;
     const BOX_X = DIALOG_MARGIN;
     const BOX_Y = game.height - BOX_H - DIALOG_MARGIN;
 
@@ -162,64 +158,14 @@ export class Dialog {
     context.drawImage(border, 8, 8, 8, 8, innerX, innerY, innerW, innerH);
     // edges
     context.drawImage(border, 8, 0, 8, 8, innerX, BOX_Y, innerW, TILE); // top
-    context.drawImage(
-      border,
-      8,
-      16,
-      8,
-      8,
-      innerX,
-      BOX_Y + BOX_H - TILE,
-      innerW,
-      TILE,
-    ); // bottom
+    context.drawImage(border, 8, 16, 8, 8, innerX, BOX_Y + BOX_H - TILE, innerW, TILE); // bottom
     context.drawImage(border, 0, 8, 8, 8, BOX_X, innerY, TILE, innerH); // left
-    context.drawImage(
-      border,
-      16,
-      8,
-      8,
-      8,
-      BOX_X + BOX_W - TILE,
-      innerY,
-      TILE,
-      innerH,
-    ); // right
+    context.drawImage(border, 16, 8, 8, 8, BOX_X + BOX_W - TILE, innerY, TILE, innerH); // right
     // corners
     context.drawImage(border, 0, 0, 8, 8, BOX_X, BOX_Y, TILE, TILE); // TL
-    context.drawImage(
-      border,
-      16,
-      0,
-      8,
-      8,
-      BOX_X + BOX_W - TILE,
-      BOX_Y,
-      TILE,
-      TILE,
-    ); // TR
-    context.drawImage(
-      border,
-      0,
-      16,
-      8,
-      8,
-      BOX_X,
-      BOX_Y + BOX_H - TILE,
-      TILE,
-      TILE,
-    ); // BL
-    context.drawImage(
-      border,
-      16,
-      16,
-      8,
-      8,
-      BOX_X + BOX_W - TILE,
-      BOX_Y + BOX_H - TILE,
-      TILE,
-      TILE,
-    ); // BR
+    context.drawImage(border, 16, 0, 8, 8, BOX_X + BOX_W - TILE, BOX_Y, TILE, TILE); // TR
+    context.drawImage(border, 0, 16, 8, 8, BOX_X, BOX_Y + BOX_H - TILE, TILE, TILE); // BL
+    context.drawImage(border, 16, 16, 8, 8, BOX_X + BOX_W - TILE, BOX_Y + BOX_H - TILE, TILE, TILE); // BR
 
     context.fillStyle = 'black';
 

@@ -35,7 +35,8 @@ const PRESS_ANIM_DURATION_MS = 167;
 export class GameBoy {
   /** @type {import('./GameWorld.js').World} */
   _world = null;
-
+  /**@type {import('../../../classes/game.js').Game} */
+  _game = null;
   /** @type {THREE.Mesh | null} D-Pad cross mesh */
   dpad = null;
 
@@ -148,6 +149,7 @@ export class GameBoy {
   }
 
   _togglePower() {
+    this._game.input.keysBlocked = !this._game.input.keysBlocked;
     this._screenOn = !this._screenOn;
     sfxPlayer.play('on');
 

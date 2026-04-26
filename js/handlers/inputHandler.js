@@ -51,6 +51,10 @@ const KEY_MAPS = {
 let _instance = null;
 
 export class InputHandler {
+  /**
+   * @type {boolean} If true, all input is blocked
+   */
+  keysBlocked = false;
   constructor() {
     this.keys = [];
 
@@ -69,6 +73,7 @@ export class InputHandler {
   }
 
   _addKey(key) {
+    if (this.keysBlocked) return;
     if (this.keys.indexOf(key) === -1) this.keys.push(key);
   }
 
@@ -79,6 +84,7 @@ export class InputHandler {
 
   /** Removes a key immediately — forces the user to release and re-press to trigger again. */
   consumeKey(key) {
+    if (this.keysBlocked) return;
     this._removeKey(key);
   }
 

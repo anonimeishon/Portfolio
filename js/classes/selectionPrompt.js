@@ -113,11 +113,10 @@ export class SelectionPrompt {
     }
 
     if (selected.action.type === 'usePortal') {
-      game.map.portal.startTransitionTo(
+      game.startMapTransition(
         selected.action.targetMap,
         selected.action.targetX,
         selected.action.targetY,
-        game,
       );
     }
   }

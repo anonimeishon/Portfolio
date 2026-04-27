@@ -4,6 +4,17 @@ import { scene, SceneContext } from './scene.js';
 import * as THREE from 'three';
 import { loadingManager } from '../../utils/loadingManager.js';
 import { SceneObject } from './SceneObject.js';
+import { TRAINER_MOVE_STEP } from '../../constants/movement.js';
+import { TileMap } from '../../classes/tileMap.js';
+import { maps } from '../../maps/index.js';
+import { Game } from '../../classes/game.js';
+
+/**
+ * @typedef {Object} PortalTransition
+ * @property {keyof maps} mapKey - The key of the target map in the maps object.
+ * @property {number} targetX - The X coordinate on the target map to teleport to.
+ * @property {number} targetY - The Y coordinate on the target map to teleport to.
+ */
 
 const spinsAmount = 16;
 
@@ -57,6 +68,7 @@ export const preloadButtonAssets = (iconPath) => {
 };
 
 export class Button extends SceneObject {
+  portal = null;
   /**
    * @type {SceneContext['scene']}
    */
@@ -98,21 +110,46 @@ export class Button extends SceneObject {
   _labelType = 'text';
   _labelText = 'START';
   _iconPath = `${ASSETS_BASE}/icons/camera.svg`;
+  _floatingText = '';
+  _floatingTextOffsetY = -0.22;
+  /** @type {THREE.Sprite | null} */
+  _floatingTextSprite = null;
+  _onClick = null;
+  /**@type {Game} */
+  _game = null;
 
-  constructor(world, options = {}) {
+  /**
+   * @type {PortalTransition | null}
+   */
+
+  _portalTransition = null;
+
+  /**
+   *
+   * @param {World} world
+   * @param {Game} game
+   * @param {{portalTransition:PortalTransition}} options
+   *
+   */
+  constructor(world, game, options = {}) {
     super({
       anchor: { enabled: false, distance: 2, marginX: 0.15, marginY: 0.15 },
     });
     this._scene = scene;
     this._world = world;
-
+    this._game = game;
     if (typeof options === 'string') {
       this._labelType = 'text';
       this._labelText = options;
+      this._position = { x: 0.4, y: 1.2, z: 0.1 };
     } else {
       this._labelType = options.labelType ?? 'text';
       this._labelText = options.labelText ?? 'START';
       this._iconPath = options.iconPath ?? `${ASSETS_BASE}/icons/camera.svg`;
+      this._floatingText = options.floatingText ?? '';
+      this._position = options.position ?? { x: 0.4, y: 1.2, z: 0.1 };
+      this._onClick = options.onClick ?? null;
+      this._portalTransition = options.portalTransition ?? null;
     }
 
     const map =
@@ -132,7 +169,7 @@ export class Button extends SceneObject {
     });
     this.geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2, 1, 1, 1);
     this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.mesh.position.set(0.4, 1.2, 0.1);
+    this.mesh.position.set(this._position.x, this._position.y, this._position.z);
     this.mesh.renderOrder = 1000;
     // this._updateScreenAnchor();
     this._baseY = this.mesh.position.y;
@@ -153,6 +190,15 @@ export class Button extends SceneObject {
         this.label = label;
         this.mesh.add(label);
         this._world.registerMesh(label, this);
+      });
+    }
+
+    if (this._floatingText) {
+      this._buildFloatingText(this._floatingText).then((sprite) => {
+        if (!sprite) return;
+        this._floatingTextSprite = sprite;
+        this._scene.add(sprite);
+        this._syncFloatingTextPosition();
       });
     }
   }
@@ -261,6 +307,58 @@ export class Button extends SceneObject {
     return label;
   }
 
+  async _buildFloatingText(text) {
+    await document.fonts.load('bold 36px Pokemon');
+
+    const canvas = document.createElement('canvas');
+    const fontSize = 20;
+    const padding = 16;
+
+    const tmpCtx = canvas.getContext('2d');
+    canvas.height = fontSize + padding * 2;
+    tmpCtx.font = `bold ${fontSize}px Pokemon`;
+    canvas.width = Math.ceil(tmpCtx.measureText(text).width) + padding * 2;
+
+    const ctx = canvas.getContext('2d');
+    ctx.font = `bold ${fontSize}px Pokemon`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#ffffff';
+    ctx.fillStyle = '#111111';
+    ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.needsUpdate = true;
+
+    const material = new THREE.SpriteMaterial({
+      map: texture,
+      opacity: 1,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    });
+
+    const label = new THREE.Sprite(material);
+    const spriteHeight = 0.1;
+    const spriteWidth = spriteHeight * (canvas.width / canvas.height);
+    label.scale.set(spriteWidth, spriteHeight, 1);
+    label.renderOrder = 1002;
+    return label;
+  }
+
+  _syncFloatingTextPosition() {
+    if (!this._floatingTextSprite || !this.mesh) return;
+    this._floatingTextSprite.position.set(
+      this.mesh.position.x,
+      this.mesh.position.y + this._floatingTextOffsetY,
+      this.mesh.position.z,
+    );
+  }
+
   _loadImage(src) {
     return new Promise((resolve) => {
       const image = new Image();
@@ -297,16 +395,28 @@ export class Button extends SceneObject {
     })
       .then(() => {
         this._isSpinning = false;
-        console.log('🚀 ~ Button.js:300 ~ Button ~ _spin ~ this._isSpinning:', this._isSpinning);
+        console.log('🚀 ~ Button.js:398 ~ Button ~ _spin ~ this._isSpinning:', this._isSpinning);
       })
       .catch((err) => {
-        console.log('🚀 ~ Button.js:303 ~ Button ~ _spin ~ r:', r);
+        console.log('🚀 ~ Button.js:401 ~ Button ~ _spin ~ r:', r);
       })
       .finally(() => {});
   }
 
   hit(e) {
-    window.switchCameraMode?.();
+    if (this._portalTransition && this._game) {
+      const { mapKey, targetX, targetY } = this._portalTransition;
+      this._game.startMapTransition(
+        mapKey,
+        targetX * TRAINER_MOVE_STEP,
+        targetY * TRAINER_MOVE_STEP,
+      );
+      setTimeout(() => {
+        window.switchCameraMode?.();
+      }, 800);
+    } else {
+      this._onClick?.();
+    }
     this._isSpinning = true;
   }
   resolveKey() {
@@ -329,5 +439,17 @@ export class Button extends SceneObject {
     } else {
       this.mesh.position.y += (this._baseY - this.mesh.position.y) * smoothing;
     }
+
+    // this._syncFloatingTextPosition();
+  }
+
+  remove() {
+    if (this._floatingTextSprite) {
+      this._scene.remove(this._floatingTextSprite);
+      this._floatingTextSprite.material?.map?.dispose();
+      this._floatingTextSprite.material?.dispose();
+      this._floatingTextSprite = null;
+    }
+    super.remove();
   }
 }

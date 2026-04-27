@@ -10,6 +10,9 @@ import { EventTrigger } from './eventTrigger.js';
 import { sfxPlayer } from './sounds/sfxPlayer.js';
 import { LINK_GITHUB, LINK_LINKEDIN, LINK_CONTACT } from '../constants/links.js';
 
+const TRANSITION_STEPS = [0.2, 0.6, 1]; // alpha at each step
+const FRAMES_PER_STEP = 4; // game frames to hold each step
+
 export class Game {
   /**
    * @type {Object.<string, EventTrigger>}
@@ -141,16 +144,86 @@ export class Game {
       return true;
     }
 
-    if (this.map.portal.activateAt(tileX, tileY, this)) {
+    if (this.map.portal?.activateAt(tileX, tileY, this)) {
       return true;
     }
 
     return false;
   }
 
+  /**
+   * Initiates a map transition with fade-out/fade-in sequence.
+   * @param {string} mapKey - The target map to load
+   * @param {number} targetX - The player's target X position
+   * @param {number} targetY - The player's target Y position
+   */
+  startMapTransition(mapKey, targetX, targetY) {
+    this.player.enableMovement = false;
+    this.state.transition = {
+      phase: 'fadeOut',
+      stepIndex: -1,
+      framesHeld: FRAMES_PER_STEP - 1,
+      mapKey,
+      targetX,
+      targetY,
+    };
+  }
+
+  updateTransition() {
+    const t = this.state.transition;
+    if (!t) return;
+
+    t.framesHeld++;
+
+    if (t.framesHeld < FRAMES_PER_STEP) return;
+    t.framesHeld = 0;
+
+    if (t.phase === 'fadeOut') {
+      t.stepIndex++;
+
+      if (t.stepIndex >= TRANSITION_STEPS.length) {
+        // Fully black — swap map and teleport player
+        this.loadMap(t.mapKey);
+        this.player.x = t.targetX;
+        this.player.y = t.targetY;
+        this.state.update({ player: this.player, mapKey: t.mapKey });
+        this.state.transition = {
+          ...t,
+          stepIndex: TRANSITION_STEPS.length - 1,
+          phase: 'fadeIn',
+        };
+      }
+    } else {
+      t.stepIndex--;
+
+      if (t.stepIndex < 0) {
+        this.state.transition = null; // done
+        this.player.enableMovement = true;
+      }
+    }
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} context
+   * @param {number} width
+   * @param {number} height
+   */
+  drawTransition(context, width, height) {
+    const t = this.state.transition;
+    if (!t) return;
+
+    const stepIndex = Math.min(t.stepIndex, TRANSITION_STEPS.length - 1);
+    const alpha = stepIndex < 0 ? 0 : TRANSITION_STEPS[stepIndex];
+    context.save();
+    context.globalAlpha = alpha;
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, width, height);
+    context.restore();
+  }
+
   update(deltaTime, fps) {
     if (this.state.transition) {
-      this.map.portal.updateTransition(this);
+      this.updateTransition();
       return; // block player input during transition
     }
     if (this.state.activeEvent) {
@@ -214,8 +287,7 @@ export class Game {
     context.fillRect(0, 0, this.width, this.height);
     this.map.draw(context, this.cameraX, this.cameraY);
     this.player.draw(context);
-    if (this.state.transition)
-      this.map.portal.drawTransition(context, this.width, this.height, this);
+    if (this.state.transition) this.drawTransition(context, this.width, this.height);
     this.menu.draw(context, this);
     if (this.state.activeEvent) {
       this.state.activeEvent.dialog.draw(context, this);

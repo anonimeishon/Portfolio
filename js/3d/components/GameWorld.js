@@ -128,6 +128,7 @@ export class World {
     this._updatePointer(event);
     this._raycaster.setFromCamera(this._pointer, camera);
     const meshes = [...this._meshToEntity.keys()];
+
     const hits = this._raycaster.intersectObjects(meshes, true);
     return hits[0] ?? null;
   }
@@ -138,15 +139,16 @@ export class World {
 
     const entity = this._meshToEntity.get(intersection.object);
     if (!entity) return;
-    entity?.hit?.(event, intersection);
 
-    const handledByEntity = entity.onPointerDown?.(event, intersection) ?? false;
+    const handledByEntity = entity?.hit?.(event, intersection) ?? false;
+
     if (handledByEntity) {
       event.preventDefault();
       return;
     }
 
     const key = entity.resolveKey(intersection);
+
     if (!key) return;
 
     this._activeButtons.set(event.pointerId, {

@@ -14,8 +14,11 @@ import { inputHandler } from '../../../handlers/inputHandler.js';
 import { gltfModelLoader } from '../../helpers/gltfLoader.js';
 import { screenLight } from './light/screenPointLight.js';
 import { sfxPlayer } from '../../../classes/sounds/sfxPlayer.js';
+import { SceneObject } from '../SceneObject.js';
+import { CAMERA_BUTTON_STATE_RESET, cameraButtonState } from '../../helpers/cameraButtonState.js';
 const CASE_COLOR = 0x8953a9;
-
+const CASE_MESH_NAME = 'Case';
+const CASE_DEFAULT_MATERIAL_NAME = 'defaultMaterial003';
 /** Duration (ms) to keep the A-button press animation active after the key is consumed (~167ms). */
 const PRESS_ANIM_DURATION_MS = 167;
 
@@ -32,8 +35,8 @@ const PRESS_ANIM_DURATION_MS = 167;
  *
  * Implement press / release animations in onPress() and onRelease().
  */
-export class GameBoy {
-  /** @type {import('./GameWorld.js').World} */
+export class GameBoy extends SceneObject {
+  /** @type {import('../GameWorld.js').World} */
   _world = null;
   /**@type {import('../../../classes/game.js').Game} */
   _game = null;
@@ -92,6 +95,7 @@ export class GameBoy {
   _bButtonTargetY = 0;
 
   constructor(world, game) {
+    super();
     this._world = world;
     this._game = game;
     /**
@@ -205,7 +209,8 @@ export class GameBoy {
     };
   }
 
-  onPointerDown(event, intersection) {
+  hit(event, intersection) {
+    if (cameraButtonState.cameraMode === CAMERA_BUTTON_STATE_RESET) window.switchCameraMode();
     if (!this.screenPlane || intersection.object !== this.screenPlane) {
       return false;
     }
@@ -233,8 +238,12 @@ export class GameBoy {
     model.traverse((child) => {
       if (!child.isMesh) return;
 
-      if (child.parent?.name === 'Case') this._setupCase(child);
+      if (child.parent?.name === CASE_MESH_NAME) {
+        this._world.registerMesh(child, this);
+        this._setupCase(child);
+      }
       if (child.parent?.name === 'Screen') this._setupScreen(child);
+
       this._tryRegisterButton(child);
     });
 

@@ -4,20 +4,20 @@ const arrowVariation = Math.random() * 1000;
 
 /** @type {import('./Tutorial.js').TutorialStep[]} */
 const CONTROLS_STEPS = [
-  {
-    toastText: 'Click the camera button to switch to game view!',
-    toastPosition: 'bottom',
-    arrowOrientation: 'downLeft',
-    arrowOptions: {
-      size: 0.4,
-      color: 0xffffff,
-      position: { x: 0.7, y: 1.5, z: 0.1 },
-      variateMovement: true,
-      movementVariationX: arrowVariation,
-      movementVariationY: arrowVariation,
-    },
-    completionEvent: 'tutorial:cameraSwitch',
-  },
+  // {
+  //   toastText: 'Click the camera button to switch to game view!',
+  //   toastPosition: 'bottom',
+  //   arrowOrientation: 'downLeft',
+  //   arrowOptions: {
+  //     size: 0.4,
+  //     color: 0xffffff,
+  //     position: { x: 0.7, y: 1.5, z: 0.1 },
+  //     variateMovement: true,
+  //     movementVariationX: arrowVariation,
+  //     movementVariationY: arrowVariation,
+  //   },
+  //   completionEvent: 'tutorial:cameraSwitch',
+  // },
   {
     toastText: 'Use the D-Pad (or arrow keys) to move around!',
     toastPosition: 'bottom',
